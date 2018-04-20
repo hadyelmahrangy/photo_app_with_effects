@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">PhotoApp</string>
+
+    <!--Permissions-->
+    <string name="no_permissions">No permissions</string>
+    <string name="enable_permission">Please, enable %1$s permission in app settings</string>
+    <string name="open_settings">Open Settings</string>
+    <string name="cancel">Cancel</string>
+
 </resources>
