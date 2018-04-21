@@ -1,31 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black">
 
-    <com.google.android.cameraview.CameraView
-        android:id="@+id/camera"
+    <hadyelmahrangy.com.photoapp.camera.CameraSourcePreview
+        android:id="@+id/preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:adjustViewBounds="true"
         android:background="@android:color/black"
-        android:keepScreenOn="true"
-        app:autoFocus="true" />
+        android:keepScreenOn="true">
 
-    <ImageView
+        <hadyelmahrangy.com.photoapp.camera.GraphicOverlay
+            android:id="@+id/faceOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </hadyelmahrangy.com.photoapp.camera.CameraSourcePreview>
+
+
+    <CheckBox
         android:id="@+id/iv_flash"
-        android:layout_width="50dp"
-        android:layout_height="60dp"
+        android:layout_width="25dp"
+        android:layout_height="35dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:padding="13dp"
+        android:layout_margin="13dp"
+        android:text="@null"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
+        android:button="@null"
         android:scaleType="fitXY"
-        android:src="@mipmap/flash_off" />
+        android:background="@drawable/selector_flash" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -44,6 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:foreground="?android:attr/selectableItemBackgroundBorderless"
                 android:padding="10dp"
                 android:src="@mipmap/btn_swap_camera" />
 
@@ -59,6 +68,7 @@
                 android:layout_width="85dp"
                 android:layout_height="85dp"
                 android:layout_gravity="center"
+                android:foreground="?android:attr/selectableItemBackgroundBorderless"
                 android:padding="10dp"
                 android:src="@mipmap/btn_take_photo" />
 
@@ -74,6 +84,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:foreground="?android:attr/selectableItemBackgroundBorderless"
                 android:padding="10dp"
                 android:src="@mipmap/btn_library" />
 

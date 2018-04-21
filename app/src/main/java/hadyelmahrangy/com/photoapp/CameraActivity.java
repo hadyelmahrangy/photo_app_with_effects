@@ -1,17 +1,36 @@
 package hadyelmahrangy.com.photoapp;
 
 import android.Manifest;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 
-import com.google.android.cameraview.CameraView;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.vision.MultiProcessor;
+import com.google.android.gms.vision.Tracker;
+import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.FaceDetector;
+
+import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import hadyelmahrangy.com.photoapp.camera.CameraFaceHelper;
+import hadyelmahrangy.com.photoapp.camera.CameraSource;
+import hadyelmahrangy.com.photoapp.camera.CameraSourcePreview;
+import hadyelmahrangy.com.photoapp.camera.GraphicOverlay;
 import hadyelmahrangy.com.photoapp.util.PermissionManager;
 
 public class CameraActivity extends AppCompatActivity {
@@ -20,7 +39,7 @@ public class CameraActivity extends AppCompatActivity {
     private static final int RC_CAMERA_PERMISSION = 1;
 
     @BindView(R.id.iv_flash)
-    ImageView ivFlash;
+    CheckBox ivFlash;
 
     @BindView(R.id.iv_swap_camera)
     ImageView ivSwapCamera;
@@ -31,23 +50,33 @@ public class CameraActivity extends AppCompatActivity {
     @BindView(R.id.iv_open_gallery)
     ImageView ivOpenGallery;
 
-    @BindView(R.id.camera)
-    CameraView camera;
+    @BindView(R.id.preview)
+    CameraSourcePreview mPreview;
+
+    @BindView(R.id.faceOverlay)
+    GraphicOverlay mGraphicOverlay;
+
+    private CameraSource mCameraSource;
+
+    private int mCameraFacing = CameraSource.CAMERA_FACING_BACK;
+
+    private String mFlashState = Camera.Parameters.FLASH_MODE_OFF;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         ButterKnife.bind(this);
-        initCamera();
-        startCamera();
+        if (hasCameraPermission()) {
+            createCamera();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         hideStatusBar();
-        //TODO IF HAVENT PERMISSION
+        startCameraSource();
     }
 
     @Override
@@ -56,23 +85,110 @@ public class CameraActivity extends AppCompatActivity {
         finishCamera();
     }
 
-    private void initCamera() {
-        if (camera != null) {
-            camera.addCallback(cameraCallback);
-            camera.setFlash(CameraView.FLASH_OFF);
-        }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        releaseCameraSource();
     }
 
-    private void startCamera() {
-        if (camera != null) {
-            if (!hasCameraPermission()) return;
-            camera.start();
+    @OnClick(R.id.iv_swap_camera)
+    public void swapCameraClick() {
+        finishCamera();
+        swapCamera();
+        startCameraSource();
+    }
+
+    @OnClick(R.id.iv_flash)
+    public void swapFlashClick() {
+        swapFlash();
+    }
+
+    @OnClick(R.id.iv_create_photo)
+    public void makePhotoClick() {
+        mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] data) {
+                Log.e("", "onPictureTaken: ");
+            }
+        });
+    }
+
+    private void swapCamera() {
+        mCameraFacing = mCameraSource.getCameraFacing() == CameraSource.CAMERA_FACING_FRONT ?
+                CameraSource.CAMERA_FACING_BACK :
+                CameraSource.CAMERA_FACING_FRONT;
+        mFlashState = Camera.Parameters.FLASH_MODE_OFF;
+        ivFlash.setChecked(false);
+        createCamera();
+    }
+
+    private void swapFlash() {
+        if (mCameraSource.getFlashMode() != null) {
+            boolean isOn = mCameraSource.getFlashMode().equals(Camera.Parameters.FLASH_MODE_ON);
+            mFlashState = isOn
+                    ? Camera.Parameters.FLASH_MODE_OFF
+                    : Camera.Parameters.FLASH_MODE_ON;
+            ivFlash.setChecked(!isOn);
+        }
+
+        mCameraSource.setFlashMode(mFlashState);
+    }
+
+    private void createCamera() {
+        Context context = getApplicationContext();
+        FaceDetector detector = new FaceDetector.Builder(context)
+                .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
+                .setMode(FaceDetector.ACCURATE_MODE)
+                .build();
+
+        detector.setProcessor(
+                new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory())
+                        .build());
+
+        Point point = getSizePoint();
+        CameraSource.Builder cameraBuilder = new CameraSource.Builder(context, detector)
+                .setRequestedPreviewSize(point.x, point.y)
+                .setFacing(mCameraFacing)
+                .setRequestedFps(30.0f)
+                .setFlashMode(mFlashState);
+
+        mCameraSource = cameraBuilder.build();
+    }
+
+    private Point getSizePoint() {
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        return size;
+    }
+
+    private void startCameraSource() {
+        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(
+                getApplicationContext());
+        if (code != ConnectionResult.SUCCESS) {
+            Dialog dlg =
+                    GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_CAMERA_PERMISSION);
+            dlg.show();
+        }
+
+        if (mCameraSource != null) {
+            try {
+                mPreview.start(mCameraSource, mGraphicOverlay);
+
+            } catch (IOException e) {
+                mCameraSource.release();
+                mCameraSource = null;
+            }
         }
     }
 
     private void finishCamera() {
-        if (camera != null) {
-            camera.stop();
+        mPreview.stop();
+    }
+
+    private void releaseCameraSource() {
+        if (mCameraSource != null) {
+            mCameraSource.release();
         }
     }
 
@@ -82,26 +198,6 @@ public class CameraActivity extends AppCompatActivity {
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
     }
-
-    CameraView.Callback cameraCallback = new CameraView.Callback() {
-        @Override
-        public void onCameraOpened(CameraView cameraView) {
-            super.onCameraOpened(cameraView);
-            //TODO
-        }
-
-        @Override
-        public void onCameraClosed(CameraView cameraView) {
-            super.onCameraClosed(cameraView);
-            //TODO
-        }
-
-        @Override
-        public void onPictureTaken(CameraView cameraView, byte[] data) {
-            super.onPictureTaken(cameraView, data);
-            //TODO
-        }
-    };
 
     private boolean hasCameraPermission() {
         return PermissionManager.hasPermission(this, PERMISSION_CAMERA, RC_CAMERA_PERMISSION);
@@ -120,7 +216,8 @@ public class CameraActivity extends AppCompatActivity {
 
             if (requestCode == RC_CAMERA_PERMISSION) {
                 if (result == PackageManager.PERMISSION_GRANTED) {
-                    startCamera();
+                    createCamera();
+
                 } else {
                     if (isPermissionNeverAsk(permission)) {
                         PermissionManager.showPermissionNeverAskDialog(CameraActivity.this, getPermissionName(requestCode));
@@ -139,4 +236,13 @@ public class CameraActivity extends AppCompatActivity {
         }
         return "";
     }
+
+    private class GraphicFaceTrackerFactory implements MultiProcessor.Factory<Face> {
+        @Override
+        public Tracker<Face> create(Face face) {
+            return new CameraFaceHelper.GraphicFaceTracker(mGraphicOverlay);
+        }
+    }
+
+
 }
