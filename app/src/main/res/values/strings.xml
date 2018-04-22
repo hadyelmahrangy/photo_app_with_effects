@@ -7,4 +7,8 @@
     <string name="open_settings">Open Settings</string>
     <string name="cancel">Cancel</string>
 
+    <!--Gallery activity-->
+    <string name="gallery_title">Select photo</string>
+
+
 </resources>
