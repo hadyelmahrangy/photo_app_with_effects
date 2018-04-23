@@ -125,7 +125,38 @@ public class CameraSourcePreview extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        int width = 320;
+      /*  int width = 320;
+        int height = 240;
+        if (mCameraSource != null) {
+            Size size = mCameraSource.getPreviewSize();
+            if (size != null) {
+                width = size.getWidth();
+                height = size.getHeight();
+            }
+        }
+
+        // Swap width and height sizes when in portrait, since it will be rotated 90 degrees
+        if (isPortraitMode()) {
+            int tmp = width;
+            //noinspection SuspiciousNameCombination
+            width = height;
+            height = tmp;
+        }
+
+        final int layoutWidth = right - left;
+        final int layoutHeight = bottom - top;
+
+        for (int i = 0; i < getChildCount(); ++i) {
+            getChildAt(i).layout(0, 0, layoutWidth, layoutHeight);
+        }
+
+        try {
+            startIfReady();
+        } catch (IOException e) {
+            Log.e(TAG, "Could not start camera source.", e);
+        }
+*/
+int width = 320;
         int height = 240;
         if (mCameraSource != null) {
             Size size = mCameraSource.getPreviewSize();
@@ -149,6 +180,7 @@ public class CameraSourcePreview extends ViewGroup {
         int childWidth = layoutWidth;
         int childHeight = (int)(((float) layoutWidth / (float) width) * height);
 
+
         // If height is too tall using fit width, does fit height instead.
         if (childHeight > layoutHeight) {
             childHeight = layoutHeight;
@@ -156,7 +188,7 @@ public class CameraSourcePreview extends ViewGroup {
         }
 
         for (int i = 0; i < getChildCount(); ++i) {
-            getChildAt(i).layout(0, 0, childWidth, childHeight);
+            getChildAt(i).layout(0, 0, width, height);
         }
 
         try {
@@ -164,6 +196,61 @@ public class CameraSourcePreview extends ViewGroup {
         } catch (IOException e) {
             Log.e(TAG, "Could not start camera source.", e);
         }
+
+       /* int previewWidth = 320;
+        int previewHeight = 240;
+        if (mCameraSource != null) {
+            Size size = mCameraSource.getPreviewSize();
+            if (size != null) {
+                previewWidth = size.getWidth();
+                previewHeight = size.getHeight();
+            }
+        }
+
+        // Swap width and height sizes when in portrait, since it will be rotated 90 degrees
+        if (isPortraitMode()) {
+            int tmp = previewWidth;
+            previewWidth = previewHeight;
+            previewHeight = tmp;
+        }
+
+        final int viewWidth = right - left;
+        final int viewHeight = bottom - top;
+
+        int childWidth;
+        int childHeight;
+        int childXOffset = 0;
+        int childYOffset = 0;
+        float widthRatio = (float) viewWidth / (float) previewWidth;
+        float heightRatio = (float) viewHeight / (float) previewHeight;
+
+        // To fill the view with the camera preview, while also preserving the correct aspect ratio,
+        // it is usually necessary to slightly oversize the child and to crop off portions along one
+        // of the dimensions.  We scale up based on the dimension requiring the most correction, and
+        // compute a crop offset for the other dimension.
+        if (widthRatio > heightRatio) {
+            childWidth = viewWidth;
+            childHeight = (int) ((float) previewHeight * widthRatio);
+            childYOffset = (childHeight - viewHeight) / 2;
+        } else {
+            childWidth = (int) ((float) previewWidth * heightRatio);
+            childHeight = viewHeight;
+            childXOffset = (childWidth - viewWidth) / 2;
+        }
+
+        for (int i = 0; i < getChildCount(); ++i) {
+            // One dimension will be cropped.  We shift child over or up by this offset and adjust
+            // the size to maintain the proper aspect ratio.
+            getChildAt(i).layout(
+                    -1 * childXOffset, -1 * childYOffset,
+                    childWidth - childXOffset, childHeight - childYOffset);
+        }
+
+        try {
+            startIfReady();
+        } catch (IOException e) {
+            Log.e(TAG, "Could not start camera source.", e);
+        }*/
     }
 
     private boolean isPortraitMode() {

@@ -9,6 +9,7 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
@@ -58,7 +59,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private CameraSource mCameraSource;
 
-    private int mCameraFacing = CameraSource.CAMERA_FACING_BACK;
+    private int mCameraFacing = CameraSource.CAMERA_FACING_FRONT;
 
     private String mFlashState = Camera.Parameters.FLASH_MODE_OFF;
 
@@ -128,10 +129,12 @@ public class CameraActivity extends AppCompatActivity {
             mFlashState = isOn
                     ? Camera.Parameters.FLASH_MODE_OFF
                     : Camera.Parameters.FLASH_MODE_ON;
+
+            if (mCameraFacing == CameraSource.CAMERA_FACING_BACK) {
+                mCameraSource.setFlashMode(mFlashState);
+            }
             ivFlash.setChecked(!isOn);
         }
-
-        mCameraSource.setFlashMode(mFlashState);
     }
 
     private void createCamera() {
@@ -145,11 +148,14 @@ public class CameraActivity extends AppCompatActivity {
                 new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory())
                         .build());
 
-        Point point = getSizePoint();
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
         CameraSource.Builder cameraBuilder = new CameraSource.Builder(context, detector)
-                .setRequestedPreviewSize(point.x, point.y)
                 .setFacing(mCameraFacing)
+                .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
                 .setRequestedFps(30.0f)
+                .setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)
                 .setFlashMode(mFlashState);
 
         mCameraSource = cameraBuilder.build();
