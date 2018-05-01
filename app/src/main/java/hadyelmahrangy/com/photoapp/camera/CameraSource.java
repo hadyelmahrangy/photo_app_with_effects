@@ -470,7 +470,8 @@ public class CameraSource {
             currentZoom = parameters.getZoom() + 1;
             float newZoom;
             if (scale > 1) {
-                newZoom = currentZoom + scale * (maxZoom / 10);
+                float coeff = 0.7f;
+                newZoom = currentZoom + scale * coeff;
             } else {
                 newZoom = currentZoom * scale;
             }

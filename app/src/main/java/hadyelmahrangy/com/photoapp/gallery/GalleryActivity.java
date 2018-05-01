@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import hadyelmahrangy.com.photoapp.CameraActivity;
 import hadyelmahrangy.com.photoapp.R;
 import hadyelmahrangy.com.photoapp.util.PermissionManager;
 

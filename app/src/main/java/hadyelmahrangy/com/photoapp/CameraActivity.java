@@ -10,7 +10,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -28,6 +31,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import hadyelmahrangy.com.photoapp.camera.CameraFaceHelper;
+import hadyelmahrangy.com.photoapp.camera.CameraScaleListener;
 import hadyelmahrangy.com.photoapp.camera.CameraSource;
 import hadyelmahrangy.com.photoapp.camera.CameraSourcePreview;
 import hadyelmahrangy.com.photoapp.camera.GraphicOverlay;
@@ -66,11 +70,16 @@ public class CameraActivity extends AppCompatActivity {
 
     private String mFlashState = Camera.Parameters.FLASH_MODE_OFF;
 
+    private ScaleGestureDetector scaleGestureDetector;
+    private CameraScaleListener mCameraScaleListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         ButterKnife.bind(this);
+        mCameraScaleListener = new CameraScaleListener();
+        scaleGestureDetector = new ScaleGestureDetector(this, mCameraScaleListener);
         if (hasCameraPermission()) {
             createCamera();
         }
@@ -93,6 +102,12 @@ public class CameraActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         releaseCameraSource();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent e) {
+        boolean b = scaleGestureDetector.onTouchEvent(e);
+        return b || super.onTouchEvent(e);
     }
 
     @OnClick(R.id.iv_swap_camera)
@@ -162,12 +177,13 @@ public class CameraActivity extends AppCompatActivity {
 
         CameraSource.Builder cameraBuilder = new CameraSource.Builder(context, detector)
                 .setFacing(mCameraFacing)
-                .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
+//                .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
                 .setRequestedFps(30.0f)
                 .setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)
                 .setFlashMode(mFlashState);
 
         mCameraSource = cameraBuilder.build();
+        mCameraScaleListener.setCameraSource(mCameraSource);
     }
 
     private void startCameraSource() {
@@ -263,9 +279,7 @@ public class CameraActivity extends AppCompatActivity {
     private class GraphicFaceTrackerFactory implements MultiProcessor.Factory<Face> {
         @Override
         public Tracker<Face> create(Face face) {
-            return new CameraFaceHelper.GraphicFaceTracker(mGraphicOverlay);
+            return new CameraFaceHelper.GraphicFaceTracker(mGraphicOverlay, CameraActivity.this);
         }
     }
-
-
 }

@@ -1,21 +1,20 @@
 package hadyelmahrangy.com.photoapp.camera;
 
+import android.content.Context;
+
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
 public class CameraFaceHelper {
 
-
-
-
     public static class GraphicFaceTracker extends Tracker<Face> {
         private GraphicOverlay mOverlay;
         private FaceGraphic mFaceGraphic;
 
-        public GraphicFaceTracker(GraphicOverlay overlay) {
+        public GraphicFaceTracker(GraphicOverlay overlay, Context context) {
             mOverlay = overlay;
-            mFaceGraphic = new FaceGraphic(overlay);
+            mFaceGraphic = new FaceGraphic(overlay, context);
         }
 
         /**

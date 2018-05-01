@@ -156,7 +156,7 @@ public class CameraSourcePreview extends ViewGroup {
             Log.e(TAG, "Could not start camera source.", e);
         }
 */
-int width = 320;
+     /*   int width = 320;
         int height = 240;
         if (mCameraSource != null) {
             Size size = mCameraSource.getPreviewSize();
@@ -178,13 +178,13 @@ int width = 320;
 
         // Computes height and width for potentially doing fit width.
         int childWidth = layoutWidth;
-        int childHeight = (int)(((float) layoutWidth / (float) width) * height);
+        int childHeight = (int) (((float) layoutWidth / (float) width) * height);
 
 
         // If height is too tall using fit width, does fit height instead.
         if (childHeight > layoutHeight) {
             childHeight = layoutHeight;
-            childWidth = (int)(((float) layoutHeight / (float) height) * width);
+            childWidth = (int) (((float) layoutHeight / (float) height) * width);
         }
 
         for (int i = 0; i < getChildCount(); ++i) {
@@ -195,9 +195,9 @@ int width = 320;
             startIfReady();
         } catch (IOException e) {
             Log.e(TAG, "Could not start camera source.", e);
-        }
+        }*/
 
-       /* int previewWidth = 320;
+        int previewWidth = 320;
         int previewHeight = 240;
         if (mCameraSource != null) {
             Size size = mCameraSource.getPreviewSize();
@@ -250,7 +250,7 @@ int width = 320;
             startIfReady();
         } catch (IOException e) {
             Log.e(TAG, "Could not start camera source.", e);
-        }*/
+        }
     }
 
     private boolean isPortraitMode() {
