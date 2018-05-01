@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">PhotoApp</string>
+    <string name="loading">Loading…</string>
+    <string name="saving">Saving…</string>
+    <string name="saved">Saved</string>
+    <string name="saving_fail">Saving fail</string>
 
     <!--Permissions-->
     <string name="no_permissions">No permissions</string>
@@ -9,6 +13,18 @@
 
     <!--Gallery activity-->
     <string name="gallery_title">Select photo</string>
+
+    <!-- Social-->
+    <string name="messenger">Messenger</string>
+    <string name="instagram">Instagram</string>
+    <string name="facebook">Facebook</string>
+    <string name="whatsapp">WhatsApp</string>
+    <string name="more">More</string>
+
+    <string name="messenger_package">com.facebook.orca</string>
+    <string name="instagram_package">com.instagram.android</string>
+    <string name="facebook_package">com.facebook.katana</string>
+    <string name="whatsapp_package">com.whatsapp</string>
 
 
 </resources>

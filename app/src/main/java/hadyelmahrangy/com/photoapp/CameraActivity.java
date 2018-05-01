@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -22,7 +24,12 @@ import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,15 +39,17 @@ import hadyelmahrangy.com.photoapp.camera.CameraSource;
 import hadyelmahrangy.com.photoapp.camera.CameraSourcePreview;
 import hadyelmahrangy.com.photoapp.camera.GraphicOverlay;
 import hadyelmahrangy.com.photoapp.gallery.GalleryActivity;
+import hadyelmahrangy.com.photoapp.result.ResultActivity;
 import hadyelmahrangy.com.photoapp.util.PermissionManager;
 
 public class CameraActivity extends AppCompatActivity {
+
+    private static final String TAG = CameraActivity.class.getSimpleName();
 
     private static final String PERMISSION_CAMERA = Manifest.permission.CAMERA;
     private static final int RC_CAMERA_PERMISSION = 1;
 
     private static final int REQUEST_LIBRARY_RESULT = 21;
-
 
     @BindView(R.id.iv_flash)
     CheckBox ivFlash;
@@ -65,6 +74,8 @@ public class CameraActivity extends AppCompatActivity {
     private int mCameraFacing = CameraSource.CAMERA_FACING_BACK;
 
     private String mFlashState = Camera.Parameters.FLASH_MODE_OFF;
+
+    private Handler mBackgroundHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,8 +122,35 @@ public class CameraActivity extends AppCompatActivity {
     public void makePhotoClick() {
         mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
             @Override
-            public void onPictureTaken(byte[] data) {
-                Log.e("", "onPictureTaken: ");
+            public void onPictureTaken(final byte[] data) {
+                Log.e(TAG, "onPictureTaken: ");
+                getBackgroundHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        OutputStream os = null;
+                        try {
+                            File file = createImageFileName();
+                            os = new FileOutputStream(file);
+                            os.write(data);
+                            os.close();
+
+                            Uri uri = Uri.fromFile(file);
+                            Log.d(TAG, "save image:" + uri);
+                            ResultActivity.launch(CameraActivity.this, uri);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Log.e(TAG, e.getMessage());
+                        } finally {
+                            if (os != null) {
+                                try {
+                                    os.close();
+                                } catch (IOException e) {
+                                    // Ignore
+                                }
+                            }
+                        }
+                    }
+                });
             }
         });
     }
@@ -238,7 +276,7 @@ public class CameraActivity extends AppCompatActivity {
                 if (intent != null && intent.getData() != null) {
                     Uri uri = intent.getData();
                     if (uri != null) {
-                        Log.d("", "Loaded photo from gallery");
+                        ResultActivity.launch(this, uri);
                     }
                 }
             }
@@ -261,5 +299,22 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
+    private Handler getBackgroundHandler() {
+        if (mBackgroundHandler == null) {
+            HandlerThread thread = new HandlerThread("background");
+            thread.start();
+            mBackgroundHandler = new Handler(thread.getLooper());
+        }
+        return mBackgroundHandler;
+    }
 
+    private File createImageFileName() throws IOException {
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String prepend = "IMAGE_" + timestamp;
+        return File.createTempFile(prepend, ".jpg", createImageFolder());
+    }
+
+    private File createImageFolder() {
+        return CameraActivity.this.getCacheDir();
+    }
 }

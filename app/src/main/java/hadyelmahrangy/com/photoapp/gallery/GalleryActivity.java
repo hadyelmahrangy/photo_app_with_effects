@@ -1,6 +1,7 @@
 package hadyelmahrangy.com.photoapp.gallery;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -13,11 +14,11 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import hadyelmahrangy.com.photoapp.CameraActivity;
 import hadyelmahrangy.com.photoapp.R;
 import hadyelmahrangy.com.photoapp.util.PermissionManager;
 
@@ -53,7 +54,10 @@ public class GalleryActivity extends AppCompatActivity {
         adapter = new GalleryAdapter(new GalleryAdapter.GalleryAdapterCallback() {
             @Override
             public void onImageClick(String imageUrl) {
-                //TODO
+                Uri uri = Uri.parse(imageUrl);
+                Intent intent = new Intent();
+                intent.setData(uri);
+                setResult(RESULT_OK, intent);
                 finish();
             }
         });
@@ -63,7 +67,7 @@ public class GalleryActivity extends AppCompatActivity {
     private ArrayList<String> getAllShownImagesPath() {
         Uri uri;
         Cursor cursor;
-        int column_index_data, column_index_folder_name;
+        int column_index_data;
         ArrayList<String> listOfAllImages = new ArrayList<String>();
         String absolutePathOfImage = null;
         uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -74,14 +78,15 @@ public class GalleryActivity extends AppCompatActivity {
         cursor = this.getContentResolver().query(uri, projection, null,
                 null, null);
 
-        column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-        column_index_folder_name = cursor
-                .getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-        while (cursor.moveToNext()) {
-            absolutePathOfImage = cursor.getString(column_index_data);
+        if (cursor != null) {
+            column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            while (cursor.moveToNext()) {
+                absolutePathOfImage = cursor.getString(column_index_data);
 
-            listOfAllImages.add(absolutePathOfImage);
+                listOfAllImages.add(absolutePathOfImage);
+            }
         }
+        Collections.reverse(listOfAllImages);
         return listOfAllImages;
     }
 
