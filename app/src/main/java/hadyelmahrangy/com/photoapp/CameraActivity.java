@@ -3,15 +3,14 @@ package hadyelmahrangy.com.photoapp;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Point;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -32,12 +31,16 @@ import hadyelmahrangy.com.photoapp.camera.CameraFaceHelper;
 import hadyelmahrangy.com.photoapp.camera.CameraSource;
 import hadyelmahrangy.com.photoapp.camera.CameraSourcePreview;
 import hadyelmahrangy.com.photoapp.camera.GraphicOverlay;
+import hadyelmahrangy.com.photoapp.gallery.GalleryActivity;
 import hadyelmahrangy.com.photoapp.util.PermissionManager;
 
 public class CameraActivity extends AppCompatActivity {
 
     private static final String PERMISSION_CAMERA = Manifest.permission.CAMERA;
     private static final int RC_CAMERA_PERMISSION = 1;
+
+    private static final int REQUEST_LIBRARY_RESULT = 21;
+
 
     @BindView(R.id.iv_flash)
     CheckBox ivFlash;
@@ -114,6 +117,12 @@ public class CameraActivity extends AppCompatActivity {
         });
     }
 
+    @OnClick(R.id.iv_open_gallery)
+    public void openGallery() {
+        Intent intent = new Intent(this, GalleryActivity.class);
+        startActivityForResult(intent, REQUEST_LIBRARY_RESULT);
+    }
+
     private void swapCamera() {
         mCameraFacing = mCameraSource.getCameraFacing() == CameraSource.CAMERA_FACING_FRONT ?
                 CameraSource.CAMERA_FACING_BACK :
@@ -159,13 +168,6 @@ public class CameraActivity extends AppCompatActivity {
                 .setFlashMode(mFlashState);
 
         mCameraSource = cameraBuilder.build();
-    }
-
-    private Point getSizePoint() {
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        return size;
     }
 
     private void startCameraSource() {
@@ -231,6 +233,21 @@ public class CameraActivity extends AppCompatActivity {
                 }
             }
 
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_LIBRARY_RESULT) {
+                if (intent != null && intent.getData() != null) {
+                    Uri uri = intent.getData();
+                    if (uri != null) {
+                        Log.d("", "Loaded photo from gallery");
+                    }
+                }
+            }
         }
     }
 
