@@ -9,7 +9,7 @@
         android:id="@+id/iv_photo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottom_container" />
+        android:scaleType="centerCrop" />
 
     <ImageView
         android:id="@+id/iv_gallery"
@@ -19,6 +19,15 @@
         android:layout_alignParentTop="true"
         android:padding="15dp"
         android:src="@mipmap/btn_library" />
+
+    <ImageView
+        android:id="@+id/iv_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:padding="15dp"
+        android:src="@drawable/ic_back" />
 
     <LinearLayout
         android:id="@+id/bottom_container"
@@ -32,7 +41,7 @@
         <ImageView
             android:id="@+id/iv_save"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_height="30dp"
             android:layout_gravity="center"
             android:layout_weight="1"
             android:src="@drawable/ic_save" />
@@ -42,12 +51,12 @@
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_weight="1"
-            android:src="@drawable/ic_camera" />
+            android:src="@mipmap/btn_take_photo" />
 
         <ImageView
             android:id="@+id/iv_share"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_height="30dp"
             android:layout_gravity="center"
             android:layout_weight="1"
             android:src="@drawable/ic_share" />
@@ -69,7 +78,7 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/messenger"
+                android:id="@+id/facebook"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -82,13 +91,13 @@
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:src="@drawable/messenger" />
+                    android:src="@drawable/facebook" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="@string/messenger"
+                    android:text="@string/facebook"
                     android:textSize="@dimen/text_size_social_title" />
 
             </LinearLayout>
@@ -119,31 +128,6 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/facebook"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="10dp"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:src="@drawable/facebook" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="@string/facebook"
-                    android:textSize="@dimen/text_size_social_title" />
-
-            </LinearLayout>
-
-            <LinearLayout
                 android:id="@+id/whatsapp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -164,6 +148,31 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:text="@string/whatsapp"
+                    android:textSize="@dimen/text_size_social_title" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/snapchat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:src="@drawable/snapchat" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/snapchat"
                     android:textSize="@dimen/text_size_social_title" />
 
             </LinearLayout>

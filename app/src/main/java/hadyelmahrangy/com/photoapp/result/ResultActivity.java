@@ -97,6 +97,11 @@ public class ResultActivity extends BaseActivity {
         finish();
     }
 
+    @OnClick(R.id.iv_back)
+    void onBackClick() {
+        finish();
+    }
+
     @OnClick(R.id.iv_share)
     void onShareClick() {
         showSharingContainer();
@@ -147,12 +152,12 @@ public class ResultActivity extends BaseActivity {
         }
     }
 
-    @OnClick(R.id.messenger)
-    void onMessengerShare() {
+    @OnClick(R.id.snapchat)
+    void onSnapchatShare() {
         if (!hasStorageReadPermission(RC_MESSENGER)) return;
         if (!hasStorageWritePermission(RC_MESSENGER)) return;
 
-        shareToSocial(getString(R.string.messenger_package));
+        shareToSocial(getString(R.string.snapchat_package));
     }
 
     @OnClick(R.id.instagram)
@@ -274,7 +279,7 @@ public class ResultActivity extends BaseActivity {
             switch (requestCode) {
                 case RC_MESSENGER:
                     if (result == PackageManager.PERMISSION_GRANTED) {
-                        onMessengerShare();
+                        onSnapchatShare();
                     } else {
                         if (isPermissionNeverAsk(permission)) {
                             PermissionManager.showPermissionNeverAskDialog(ResultActivity.this, getPermissionName(permission));
