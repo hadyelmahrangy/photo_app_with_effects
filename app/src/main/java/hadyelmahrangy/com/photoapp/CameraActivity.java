@@ -5,12 +5,16 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
+import android.support.media.ExifInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -27,10 +31,12 @@ import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -44,9 +50,10 @@ import hadyelmahrangy.com.photoapp.camera.CameraSourcePreview;
 import hadyelmahrangy.com.photoapp.camera.GraphicOverlay;
 import hadyelmahrangy.com.photoapp.gallery.GalleryActivity;
 import hadyelmahrangy.com.photoapp.result.ResultActivity;
+import hadyelmahrangy.com.photoapp.util.CapturePhotoUtils;
 import hadyelmahrangy.com.photoapp.util.PermissionManager;
 
-public class CameraActivity extends AppCompatActivity {
+public class CameraActivity extends BaseActivity {
 
     private static final String TAG = CameraActivity.class.getSimpleName();
 
@@ -85,15 +92,17 @@ public class CameraActivity extends AppCompatActivity {
     private Handler mBackgroundHandler;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera);
-        ButterKnife.bind(this);
+    protected void onViewReady() {
         mCameraScaleListener = new CameraScaleListener();
         scaleGestureDetector = new ScaleGestureDetector(this, mCameraScaleListener);
         if (hasCameraPermission()) {
             createCamera();
         }
+    }
+
+    @Override
+    protected int onRequestLayout() {
+        return R.layout.activity_camera;
     }
 
     @Override
@@ -135,39 +144,60 @@ public class CameraActivity extends AppCompatActivity {
 
     @OnClick(R.id.iv_create_photo)
     public void makePhotoClick() {
+        showProgressDialog();
         mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data) {
-                Log.e(TAG, "onPictureTaken: ");
-                getBackgroundHandler().post(new Runnable() {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                int rotationDegrees = getRotate(data);
+                CapturePhotoUtils.saveImageToGallery(CameraActivity.this, rotateBitmap(bitmap, rotationDegrees), "hitjabi", new CapturePhotoUtils.ImageLoaderCallback() {
                     @Override
-                    public void run() {
-                        OutputStream os = null;
-                        try {
-                            File file = createImageFileName();
-                            os = new FileOutputStream(file);
-                            os.write(data);
-                            os.close();
+                    public void onLoadSuccess(String path, Uri uri) {
+                        hideProgressDialog();
+                        ResultActivity.launch(CameraActivity.this, uri);
+                    }
 
-                            Uri uri = Uri.fromFile(file);
-                            Log.d(TAG, "save image:" + uri);
-                            ResultActivity.launch(CameraActivity.this, uri);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            Log.e(TAG, e.getMessage());
-                        } finally {
-                            if (os != null) {
-                                try {
-                                    os.close();
-                                } catch (IOException e) {
-                                    // Ignore
-                                }
-                            }
-                        }
+                    @Override
+                    public void onLoadFail(String error) {
+                        hideProgressDialog();
+                        showMessage(error);
                     }
                 });
             }
         });
+    }
+
+    private Bitmap rotateBitmap(Bitmap source, int angle) {
+        if (angle == 0) {
+            return source;
+        }
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
+
+    private int getRotate(byte[] data) {
+        int rotationDegrees = 0;
+        ExifInterface exifInterface = null;
+        try {
+            exifInterface = new ExifInterface(new ByteArrayInputStream(data));
+            int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotationDegrees = 90;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotationDegrees = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotationDegrees = 270;
+                    break;
+            }
+            return rotationDegrees;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return rotationDegrees;
+        }
     }
 
     @OnClick(R.id.iv_open_gallery)

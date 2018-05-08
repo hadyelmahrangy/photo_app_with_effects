@@ -77,7 +77,7 @@ public class ResultActivity extends BaseActivity {
 
         showProgressDialog(R.string.saving);
         Bitmap image = ((BitmapDrawable) ivPhoto.getDrawable()).getBitmap();
-        CapturePhotoUtils.saveImageToGallery(this, image, getApplicationName(), new CapturePhotoUtils.ImageLoaderCallback() {
+        CapturePhotoUtils.saveImageToGallery(this, image, "hitjabi", new CapturePhotoUtils.ImageLoaderCallback() {
             @Override
             public void onLoadSuccess(String path, Uri uri) {
                 hideProgressDialog();
@@ -210,7 +210,7 @@ public class ResultActivity extends BaseActivity {
 
             showProgressDialog();
             Bitmap bitmap = ((BitmapDrawable) ivPhoto.getDrawable()).getBitmap();
-            CapturePhotoUtils.saveImageToGallery(this, bitmap, getApplicationName() + " generated", new CapturePhotoUtils.ImageLoaderCallback() {
+            CapturePhotoUtils.saveImageToGallery(this, bitmap, "hitjabi", new CapturePhotoUtils.ImageLoaderCallback() {
                 @Override
                 public void onLoadSuccess(String path, Uri uri) {
                     shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
@@ -239,7 +239,7 @@ public class ResultActivity extends BaseActivity {
 
         showProgressDialog();
         Bitmap bitmap = ((BitmapDrawable) ivPhoto.getDrawable()).getBitmap();
-        CapturePhotoUtils.saveImageToGallery(this, bitmap, getApplicationName() + " generated", new CapturePhotoUtils.ImageLoaderCallback() {
+        CapturePhotoUtils.saveImageToGallery(this, bitmap, "hitjabi", new CapturePhotoUtils.ImageLoaderCallback() {
             @Override
             public void onLoadSuccess(String path, Uri uri) {
                 shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
