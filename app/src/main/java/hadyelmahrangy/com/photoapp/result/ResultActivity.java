@@ -1,15 +1,19 @@
 package hadyelmahrangy.com.photoapp.result;
 
 import android.Manifest;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import butterknife.BindView;
@@ -82,7 +86,7 @@ public class ResultActivity extends BaseActivity {
             @Override
             public void onLoadSuccess(String path, Uri uri) {
                 hideProgressDialog();
-                AdvActivity.launch(ResultActivity.this);
+                showPhotoSavedDialog();
             }
 
             @Override
@@ -91,6 +95,28 @@ public class ResultActivity extends BaseActivity {
                 showMessage(R.string.saving_fail);
             }
         });
+    }
+
+    private void showPhotoSavedDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ResultActivity.this);
+        builder.setTitle(R.string.photo_saved)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        AdvActivity.launch(ResultActivity.this);
+                    }
+                })
+                .setCancelable(false);
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                Button btnPositive = alertDialog.getButton(Dialog.BUTTON_POSITIVE);
+                btnPositive.setTextSize(18);
+            }
+        });
+        alertDialog.show();
     }
 
     @OnClick(R.id.iv_camera)

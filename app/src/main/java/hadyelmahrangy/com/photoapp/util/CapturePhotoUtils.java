@@ -1,5 +1,6 @@
 package hadyelmahrangy.com.photoapp.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
@@ -18,7 +19,7 @@ public class CapturePhotoUtils {
         void onLoadFail(String error);
     }
 
-    public static void saveImageToGallery(@NonNull final Context context, @NonNull final Bitmap bitmap, @NonNull final String packageName, @NonNull final ImageLoaderCallback callback) {
+    public static void saveImageToGallery(@NonNull final Activity activity, @NonNull final Bitmap bitmap, @NonNull final String packageName, @NonNull final ImageLoaderCallback callback) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -41,10 +42,15 @@ public class CapturePhotoUtils {
 
                 // Tell the media scanner about the new file so that it is
                 // immediately available to the user.
-                MediaScannerConnection.scanFile(context, new String[]{file.toString()}, null,
+                MediaScannerConnection.scanFile(activity, new String[]{file.toString()}, null,
                         new MediaScannerConnection.OnScanCompletedListener() {
-                            public void onScanCompleted(String path, Uri uri) {
-                                callback.onLoadSuccess(path, uri);
+                            public void onScanCompleted(final String path, final Uri uri) {
+                                activity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        callback.onLoadSuccess(path, uri);
+                                    }
+                                });
                             }
                         });
             }
