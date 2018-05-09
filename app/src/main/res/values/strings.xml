@@ -4,6 +4,7 @@
     <string name="saving">Saving…</string>
     <string name="saved">Saved</string>
     <string name="saving_fail">Saving fail</string>
+    <string name="folder_name">hitjabi</string>
 
     <!--Permissions-->
     <string name="no_permissions">No permissions</string>
@@ -13,6 +14,7 @@
 
     <!--Gallery activity-->
     <string name="gallery_title">Select photo</string>
+    <string name="not_found">Not found</string>
 
     <!-- Social-->
     <string name="snapchat">Snapchat</string>

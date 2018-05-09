@@ -15,6 +15,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public interface GalleryAdapterCallback {
         void onImageClick(String imageUrl);
+
+        void showEmptyPlaceholder();
+
+        void hideEmptyPlaceholder();
     }
 
     private List<String> images = new ArrayList<>();
@@ -51,7 +55,12 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public void setImages(@NonNull List<String> images) {
         this.images.clear();
-        this.images.addAll(images);
+        if (images.isEmpty()) {
+            callback.showEmptyPlaceholder();
+        } else {
+            callback.hideEmptyPlaceholder();
+            this.images.addAll(images);
+        }
         notifyDataSetChanged();
     }
 }

@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +30,9 @@ public class GalleryActivity extends AppCompatActivity {
 
     @BindView(R.id.rec_view)
     RecyclerView recyclerView;
+
+    @BindView(R.id.empty_placeholder)
+    View emptyPlaceholder;
 
     private GalleryAdapter adapter;
 
@@ -60,6 +64,16 @@ public class GalleryActivity extends AppCompatActivity {
                 setResult(RESULT_OK, intent);
                 finish();
             }
+
+            @Override
+            public void showEmptyPlaceholder() {
+                emptyPlaceholder.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void hideEmptyPlaceholder() {
+                emptyPlaceholder.setVisibility(View.GONE);
+            }
         });
         recyclerView.setAdapter(adapter);
     }
@@ -68,15 +82,15 @@ public class GalleryActivity extends AppCompatActivity {
         Uri uri;
         Cursor cursor;
         int column_index_data;
-        ArrayList<String> listOfAllImages = new ArrayList<String>();
-        String absolutePathOfImage = null;
+        ArrayList<String> listOfAllImages = new ArrayList<>();
+        String absolutePathOfImage;
         uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
         String[] projection = {MediaStore.MediaColumns.DATA,
                 MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
 
-        cursor = this.getContentResolver().query(uri, projection, null,
-                null, null);
+        cursor = this.getContentResolver().query(uri, projection, MediaStore.Images.Media.DATA + " like ? ",
+                new String[]{"%" + getResources().getString(R.string.folder_name) + "%"}, null);
 
         if (cursor != null) {
             column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
@@ -85,6 +99,7 @@ public class GalleryActivity extends AppCompatActivity {
 
                 listOfAllImages.add(absolutePathOfImage);
             }
+            cursor.close();
         }
         Collections.reverse(listOfAllImages);
         return listOfAllImages;
