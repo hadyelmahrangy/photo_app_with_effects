@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -94,11 +95,6 @@ public class ResultActivity extends BaseActivity {
 
     @OnClick(R.id.iv_camera)
     void onCameraClick() {
-        finish();
-    }
-
-    @OnClick(R.id.iv_back)
-    void onBackClick() {
         finish();
     }
 
