@@ -9,12 +9,18 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -82,7 +88,7 @@ public class ResultActivity extends BaseActivity {
 
         showProgressDialog(R.string.saving);
         Bitmap image = ((BitmapDrawable) ivPhoto.getDrawable()).getBitmap();
-        CapturePhotoUtils.saveImageToGallery(this, image, getResources().getString(R.string.folder_name), new CapturePhotoUtils.ImageLoaderCallback() {
+        CapturePhotoUtils.saveImageToGallery(this, image, getResources().getString(R.string.folder_name), new CapturePhotoUtils.SavePhotoToGalleryCallback() {
             @Override
             public void onLoadSuccess(String path, Uri uri) {
                 hideProgressDialog();
@@ -131,7 +137,21 @@ public class ResultActivity extends BaseActivity {
 
     private void getPhoto() {
         photoUri = getIntent().getParcelableExtra(KEY_IMAGE_URI);
-        ivPhoto.setImageURI(photoUri);
+        Glide.with(this)
+                .asBitmap()
+                .load(photoUri)
+                .apply(new RequestOptions()
+                        .placeholder(R.color.black)
+                        .dontTransform()
+                        .diskCacheStrategy(DiskCacheStrategy.NONE))
+                .into(new BitmapImageViewTarget(ivPhoto) {
+                    @Override
+                    public void onResourceReady(Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        if (!ResultActivity.this.isFinishing() && resource != null) {
+                            ivPhoto.setImageBitmap(resource);
+                        }
+                    }
+                });
     }
 
     @Override
@@ -230,7 +250,7 @@ public class ResultActivity extends BaseActivity {
 
             showProgressDialog();
             Bitmap bitmap = ((BitmapDrawable) ivPhoto.getDrawable()).getBitmap();
-            CapturePhotoUtils.saveImageToGallery(this, bitmap, getResources().getString(R.string.folder_name), new CapturePhotoUtils.ImageLoaderCallback() {
+            CapturePhotoUtils.saveImageToGallery(this, bitmap, getResources().getString(R.string.folder_name), new CapturePhotoUtils.SavePhotoToGalleryCallback() {
                 @Override
                 public void onLoadSuccess(String path, Uri uri) {
                     shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
@@ -259,7 +279,7 @@ public class ResultActivity extends BaseActivity {
 
         showProgressDialog();
         Bitmap bitmap = ((BitmapDrawable) ivPhoto.getDrawable()).getBitmap();
-        CapturePhotoUtils.saveImageToGallery(this, bitmap, getResources().getString(R.string.folder_name), new CapturePhotoUtils.ImageLoaderCallback() {
+        CapturePhotoUtils.saveImageToGallery(this, bitmap, getResources().getString(R.string.folder_name), new CapturePhotoUtils.SavePhotoToGalleryCallback() {
             @Override
             public void onLoadSuccess(String path, Uri uri) {
                 shareIntent.putExtra(Intent.EXTRA_STREAM, uri);

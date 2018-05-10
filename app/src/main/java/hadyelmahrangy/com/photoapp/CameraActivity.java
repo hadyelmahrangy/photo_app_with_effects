@@ -5,19 +5,10 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.net.Uri;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
 import android.support.annotation.NonNull;
-import android.support.media.ExifInterface;
-import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -31,17 +22,9 @@ import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import hadyelmahrangy.com.photoapp.camera.CameraFaceHelper;
 import hadyelmahrangy.com.photoapp.camera.CameraScaleListener;
@@ -54,8 +37,6 @@ import hadyelmahrangy.com.photoapp.util.CapturePhotoUtils;
 import hadyelmahrangy.com.photoapp.util.PermissionManager;
 
 public class CameraActivity extends BaseActivity {
-
-    private static final String TAG = CameraActivity.class.getSimpleName();
 
     private static final String PERMISSION_CAMERA = Manifest.permission.CAMERA;
     private static final int RC_CAMERA_PERMISSION = 1;
@@ -88,8 +69,6 @@ public class CameraActivity extends BaseActivity {
 
     private ScaleGestureDetector scaleGestureDetector;
     private CameraScaleListener mCameraScaleListener;
-
-    private Handler mBackgroundHandler;
 
     @Override
     protected void onViewReady() {
@@ -144,60 +123,22 @@ public class CameraActivity extends BaseActivity {
 
     @OnClick(R.id.iv_create_photo)
     public void makePhotoClick() {
-        showProgressDialog();
         mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                int rotationDegrees = getRotate(data);
-                CapturePhotoUtils.saveImageToGallery(CameraActivity.this, rotateBitmap(bitmap, rotationDegrees), "hitjabi", new CapturePhotoUtils.ImageLoaderCallback() {
+                CapturePhotoUtils.savePhotoToFile(CameraActivity.this, data, new CapturePhotoUtils.SavePhotoToFileCallback() {
                     @Override
-                    public void onLoadSuccess(String path, Uri uri) {
-                        hideProgressDialog();
+                    public void onSaveSuccess(Uri uri) {
                         ResultActivity.launch(CameraActivity.this, uri);
                     }
 
                     @Override
-                    public void onLoadFail(String error) {
-                        hideProgressDialog();
+                    public void onSaveFail(String error) {
                         showMessage(error);
                     }
                 });
             }
         });
-    }
-
-    private Bitmap rotateBitmap(Bitmap source, int angle) {
-        if (angle == 0) {
-            return source;
-        }
-        Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
-    }
-
-    private int getRotate(byte[] data) {
-        int rotationDegrees = 0;
-        ExifInterface exifInterface = null;
-        try {
-            exifInterface = new ExifInterface(new ByteArrayInputStream(data));
-            int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
-            switch (orientation) {
-                case ExifInterface.ORIENTATION_ROTATE_90:
-                    rotationDegrees = 90;
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_180:
-                    rotationDegrees = 180;
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_270:
-                    rotationDegrees = 270;
-                    break;
-            }
-            return rotationDegrees;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return rotationDegrees;
-        }
     }
 
     @OnClick(R.id.iv_open_gallery)
@@ -300,7 +241,8 @@ public class CameraActivity extends BaseActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults.length > 0 && permissions.length > 0) {
             int result = grantResults[0];
@@ -349,24 +291,6 @@ public class CameraActivity extends BaseActivity {
         public Tracker<Face> create(Face face) {
             return new CameraFaceHelper.GraphicFaceTracker(mGraphicOverlay, CameraActivity.this);
         }
-    }
 
-    private Handler getBackgroundHandler() {
-        if (mBackgroundHandler == null) {
-            HandlerThread thread = new HandlerThread("background");
-            thread.start();
-            mBackgroundHandler = new Handler(thread.getLooper());
-        }
-        return mBackgroundHandler;
-    }
-
-    private File createImageFileName() throws IOException {
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String prepend = "IMAGE_" + timestamp;
-        return File.createTempFile(prepend, ".jpg", createImageFolder());
-    }
-
-    private File createImageFolder() {
-        return CameraActivity.this.getCacheDir();
     }
 }
