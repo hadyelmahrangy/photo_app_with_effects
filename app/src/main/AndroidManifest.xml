@@ -28,6 +28,18 @@
             </intent-filter>
         </activity>
 
+        <provider
+            android:name=".util.PhotoFileProvider"
+            android:grantUriPermissions="true"
+            android:exported="false"
+            android:authorities="hadyelmahrangy.com.photoapp">
+
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/shared_file_paths"/>
+
+        </provider>
+
         <activity
             android:name=".gallery.GalleryActivity"
             android:screenOrientation="portrait"

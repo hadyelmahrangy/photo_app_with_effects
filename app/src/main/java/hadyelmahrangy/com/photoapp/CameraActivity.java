@@ -63,7 +63,7 @@ public class CameraActivity extends BaseActivity {
 
     private CameraSource mCameraSource;
 
-    private int mCameraFacing = CameraSource.CAMERA_FACING_FRONT;
+    private int mCameraFacing = CameraSource.CAMERA_FACING_BACK;
 
     private String mFlashState = Camera.Parameters.FLASH_MODE_OFF;
 

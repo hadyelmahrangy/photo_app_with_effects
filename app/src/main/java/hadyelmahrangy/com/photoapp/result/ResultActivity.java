@@ -6,21 +6,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
-import com.bumptech.glide.request.transition.Transition;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -62,6 +55,9 @@ public class ResultActivity extends BaseActivity {
     @BindView(R.id.bottom_container)
     View bottomContainer;
 
+    @BindView(R.id.image_container)
+    View imageContainer;
+
     private Uri photoUri;
 
     @Override
@@ -87,7 +83,7 @@ public class ResultActivity extends BaseActivity {
         if (!hasStorageReadPermission(RC_SAVE_IMAGE)) return;
 
         showProgressDialog(R.string.saving);
-        Bitmap image = ((BitmapDrawable) ivPhoto.getDrawable()).getBitmap();
+        Bitmap image = loadBitmapFromView(imageContainer);
         CapturePhotoUtils.saveImageToGallery(this, image, getResources().getString(R.string.folder_name), new CapturePhotoUtils.SavePhotoToGalleryCallback() {
             @Override
             public void onLoadSuccess(String path, Uri uri) {
@@ -137,21 +133,7 @@ public class ResultActivity extends BaseActivity {
 
     private void getPhoto() {
         photoUri = getIntent().getParcelableExtra(KEY_IMAGE_URI);
-        Glide.with(this)
-                .asBitmap()
-                .load(photoUri)
-                .apply(new RequestOptions()
-                        .placeholder(R.color.black)
-                        .dontTransform()
-                        .diskCacheStrategy(DiskCacheStrategy.NONE))
-                .into(new BitmapImageViewTarget(ivPhoto) {
-                    @Override
-                    public void onResourceReady(Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        if (!ResultActivity.this.isFinishing() && resource != null) {
-                            ivPhoto.setImageBitmap(resource);
-                        }
-                    }
-                });
+        ivPhoto.setImageURI(photoUri);
     }
 
     @Override
@@ -249,10 +231,11 @@ public class ResultActivity extends BaseActivity {
             shareIntent.setPackage(appPackage);
 
             showProgressDialog();
-            Bitmap bitmap = ((BitmapDrawable) ivPhoto.getDrawable()).getBitmap();
+            Bitmap bitmap = loadBitmapFromView(imageContainer);
             CapturePhotoUtils.saveImageToGallery(this, bitmap, getResources().getString(R.string.folder_name), new CapturePhotoUtils.SavePhotoToGalleryCallback() {
                 @Override
                 public void onLoadSuccess(String path, Uri uri) {
+                    shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
                     shareIntent.setType("image/*");
                     startActivity(shareIntent);
@@ -278,7 +261,7 @@ public class ResultActivity extends BaseActivity {
         shareIntent.setAction(Intent.ACTION_SEND);
 
         showProgressDialog();
-        Bitmap bitmap = ((BitmapDrawable) ivPhoto.getDrawable()).getBitmap();
+        Bitmap bitmap = loadBitmapFromView(imageContainer);
         CapturePhotoUtils.saveImageToGallery(this, bitmap, getResources().getString(R.string.folder_name), new CapturePhotoUtils.SavePhotoToGalleryCallback() {
             @Override
             public void onLoadSuccess(String path, Uri uri) {
@@ -371,5 +354,13 @@ public class ResultActivity extends BaseActivity {
         if (permission.equals(PERMISSION_STORAGE_READ)) return "Storage read";
         if (permission.equals(PERMISSION_STORAGE_WRITE)) return "Storage write";
         return "Storage";
+    }
+
+    private Bitmap loadBitmapFromView(View v) {
+        Bitmap b = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        v.layout(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
+        v.draw(c);
+        return b;
     }
 }

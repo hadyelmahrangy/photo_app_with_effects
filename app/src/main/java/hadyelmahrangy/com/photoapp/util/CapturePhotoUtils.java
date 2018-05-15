@@ -6,13 +6,13 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class CapturePhotoUtils {
 
@@ -61,6 +61,42 @@ public class CapturePhotoUtils {
         }).start();
     }
 
+    public static void savePhotoToFile(@NonNull final Activity activity, @NonNull final Bitmap bitmap, @NonNull final SavePhotoToFileCallback callback) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+                bitmap.recycle();
+
+                OutputStream os = null;
+                try {
+                    File file = createImageFileName(activity);
+                    os = new FileOutputStream(file);
+                    os.write(byteArray);
+                    os.close();
+                    final Uri uri = FileProvider.getUriForFile(activity, "hadyelmahrangy.com.photoapp", file);
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onSaveSuccess(uri);
+                        }
+                    });
+                } catch (IOException e) {
+                    callback.onSaveFail(e.getMessage());
+                } finally {
+                    if (os != null) {
+                        try {
+                            os.close();
+                        } catch (IOException e) {
+                            // Ignore
+                        }
+                    }
+                }
+            }
+        }).start();
+    }
 
     public static void saveImageToGallery(@NonNull final Activity activity, @NonNull final Bitmap bitmap, @NonNull final String packageName, @NonNull final SavePhotoToGalleryCallback callback) {
         new Thread(new Runnable() {
@@ -100,10 +136,8 @@ public class CapturePhotoUtils {
         }).start();
     }
 
-
     private static File createImageFileName(@NonNull Activity activity) throws IOException {
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String prepend = "IMAGE_" + timestamp;
+        String prepend = "photo_image";
         return File.createTempFile(prepend, ".jpg", createImageFolder(activity));
     }
 
