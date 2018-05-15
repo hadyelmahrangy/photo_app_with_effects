@@ -66,6 +66,12 @@ public class ResultActivity extends BaseActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        hideStatusBar();
+    }
+
+    @Override
     protected int onRequestLayout() {
         return R.layout.activity_result;
     }
