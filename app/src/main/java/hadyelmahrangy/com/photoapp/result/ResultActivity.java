@@ -180,12 +180,12 @@ public class ResultActivity extends BaseActivity {
         }
     }
 
-    @OnClick(R.id.snapchat)
+    @OnClick(R.id.messenger)
     void onSnapchatShare() {
         if (!hasStorageReadPermission(RC_MESSENGER)) return;
         if (!hasStorageWritePermission(RC_MESSENGER)) return;
 
-        shareToSocial(getString(R.string.snapchat_package));
+        shareToSocial(getString(R.string.messenger_package));
     }
 
     @OnClick(R.id.instagram)

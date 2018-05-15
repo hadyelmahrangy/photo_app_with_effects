@@ -199,7 +199,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/snapchat"
+                android:id="@+id/messenger"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -212,13 +212,13 @@
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:src="@drawable/snapchat" />
+                    android:src="@drawable/messenger" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="@string/snapchat"
+                    android:text="@string/messenger"
                     android:textSize="@dimen/text_size_social_title" />
 
             </LinearLayout>

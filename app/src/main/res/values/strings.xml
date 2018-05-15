@@ -19,13 +19,13 @@
     <string name="not_found">Not found</string>
 
     <!-- Social-->
-    <string name="snapchat">Snapchat</string>
+    <string name="messenger">Messenger</string>
     <string name="instagram">Instagram</string>
     <string name="facebook">Facebook</string>
     <string name="whatsapp">WhatsApp</string>
     <string name="more">More</string>
 
-    <string name="snapchat_package">com.snapchat.android</string>
+    <string name="messenger_package">com.facebook.orca</string>
     <string name="instagram_package">com.instagram.android</string>
     <string name="facebook_package">com.facebook.katana</string>
     <string name="whatsapp_package">com.whatsapp</string>
