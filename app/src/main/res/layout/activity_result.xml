@@ -18,14 +18,16 @@
             android:scaleType="fitXY" />
 
         <hadyelmahrangy.com.photoapp.result.CustomTextView
+            android:id="@+id/tv_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_marginBottom="6dp"
-            android:layout_marginEnd="6dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginEnd="4dp"
             android:text="@string/folder_name"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="22sp"
+            android:fontFamily="@font/label_font"
             app:outerShadowRadius="0.5dp"
             app:strokeColor="@color/black"
             app:strokeJoinStyle="miter"
