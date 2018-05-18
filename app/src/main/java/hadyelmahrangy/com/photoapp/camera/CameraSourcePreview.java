@@ -50,12 +50,12 @@ public class CameraSourcePreview extends ViewGroup {
         addView(mSurfaceView);
     }
 
-    public void start(CameraSource cameraSource) throws IOException {
-        if (cameraSource == null) {
+    public void start(CameraSource CameraSource) throws IOException {
+        if (CameraSource == null) {
             stop();
         }
 
-        mCameraSource = cameraSource;
+        mCameraSource = CameraSource;
 
         if (mCameraSource != null) {
             mStartRequested = true;
@@ -63,9 +63,9 @@ public class CameraSourcePreview extends ViewGroup {
         }
     }
 
-    public void start(CameraSource cameraSource, GraphicOverlay overlay) throws IOException {
+    public void start(CameraSource CameraSource, GraphicOverlay overlay) throws IOException {
         mOverlay = overlay;
-        start(cameraSource);
+        start(CameraSource);
     }
 
     public void stop() {

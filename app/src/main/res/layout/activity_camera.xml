@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fireTopLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black">
+    android:background="#000"
+    android:keepScreenOn="true"
+    android:orientation="vertical">
 
     <hadyelmahrangy.com.photoapp.camera.CameraSourcePreview
-        android:id="@+id/preview"
+        android:id="@+id/firePreview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:adjustViewBounds="true"
-        android:background="@android:color/black"
-        android:keepScreenOn="true">
+        android:layout_alignParentTop="true">
 
         <hadyelmahrangy.com.photoapp.camera.GraphicOverlay
-            android:id="@+id/faceOverlay"
+            android:id="@+id/fireFaceOverlay"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true" />
     </hadyelmahrangy.com.photoapp.camera.CameraSourcePreview>
-
 
     <CheckBox
         android:id="@+id/iv_flash"
@@ -29,11 +30,11 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_margin="13dp"
-        android:text="@null"
-        android:foreground="?android:attr/selectableItemBackgroundBorderless"
+        android:background="@drawable/selector_flash"
         android:button="@null"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
         android:scaleType="fitXY"
-        android:background="@drawable/selector_flash" />
+        android:text="@null" />
 
     <LinearLayout
         android:layout_width="match_parent"
