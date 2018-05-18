@@ -33,6 +33,7 @@ import hadyelmahrangy.com.photoapp.R;
 import hadyelmahrangy.com.photoapp.gallery.GalleryActivity;
 import hadyelmahrangy.com.photoapp.camera.facedetection.FaceDetectionProcessor;
 import hadyelmahrangy.com.photoapp.result.ResultActivity;
+import hadyelmahrangy.com.photoapp.util.CapturePhotoUtils;
 import hadyelmahrangy.com.photoapp.util.PermissionManager;
 
 @KeepName
@@ -62,7 +63,7 @@ public final class CameraActivity extends BaseActivity {
     @BindView(R.id.iv_open_gallery)
     ImageView ivOpenGallery;
 
-    private CameraSource CameraSource = null;
+    private CameraSource cameraSource = null;
     private boolean isBackMode = true;
 
     @Override
@@ -91,8 +92,8 @@ public final class CameraActivity extends BaseActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (CameraSource != null) {
-            CameraSource.release();
+        if (cameraSource != null) {
+            cameraSource.release();
         }
     }
 
@@ -104,12 +105,12 @@ public final class CameraActivity extends BaseActivity {
     @OnClick(R.id.iv_swap_camera)
     public void swapCameraClick() {
         Log.d(TAG, "Set facing");
-        if (CameraSource != null) {
+        if (cameraSource != null) {
             isBackMode = !isBackMode;
             if (isBackMode) {
-                CameraSource.setFacing(CameraSource.CAMERA_FACING_BACK);
+                cameraSource.setFacing(CameraSource.CAMERA_FACING_BACK);
             } else {
-                CameraSource.setFacing(CameraSource.CAMERA_FACING_FRONT);
+                cameraSource.setFacing(CameraSource.CAMERA_FACING_FRONT);
             }
         }
         preview.stop();
@@ -123,23 +124,22 @@ public final class CameraActivity extends BaseActivity {
 
     @OnClick(R.id.iv_create_photo)
     public void makePhotoClick() {
-        //TODO
-//        mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
-//            @Override
-//            public void onPictureTaken(final byte[] data) {
-//                CapturePhotoUtils.savePhotoToFile(CameraActivityOld.this, data, new CapturePhotoUtils.SavePhotoToFileCallback() {
-//                    @Override
-//                    public void onSaveSuccess(Uri uri) {
-//                        ResultActivity.launch(CameraActivityOld.this, uri);
-//                    }
-//
-//                    @Override
-//                    public void onSaveFail(String error) {
-//                        showMessage(error);
-//                    }
-//                });
-//            }
-//        });
+        cameraSource.takePicture(null, new CameraSource.PictureCallback() {
+            @Override
+            public void onPictureTaken(final byte[] data) {
+                CapturePhotoUtils.savePhotoToFile(CameraActivity.this, data, new CapturePhotoUtils.SavePhotoToFileCallback() {
+                    @Override
+                    public void onSaveSuccess(Uri uri) {
+                        ResultActivity.launch(CameraActivity.this, uri);
+                    }
+
+                    @Override
+                    public void onSaveFail(String error) {
+                        showMessage(error);
+                    }
+                });
+            }
+        });
     }
 
     @OnClick(R.id.iv_open_gallery)
@@ -150,11 +150,11 @@ public final class CameraActivity extends BaseActivity {
 
 
     private void createCameraSource() {
-        // If there's no existing CameraSource, create one.
-        if (CameraSource == null) {
-            CameraSource = new CameraSource(this, graphicOverlay);
+        // If there's no existing cameraSource, create one.
+        if (cameraSource == null) {
+            cameraSource = new CameraSource(this, graphicOverlay);
         }
-        CameraSource.setMachineLearningFrameProcessor(new FaceDetectionProcessor());
+        cameraSource.setMachineLearningFrameProcessor(new FaceDetectionProcessor());
     }
 
     /**
@@ -163,7 +163,7 @@ public final class CameraActivity extends BaseActivity {
      * again when the camera source is created.
      */
     private void startCameraSource() {
-        if (CameraSource != null) {
+        if (cameraSource != null) {
             try {
                 if (preview == null) {
                     Log.d(TAG, "resume: Preview is null");
@@ -171,11 +171,11 @@ public final class CameraActivity extends BaseActivity {
                 if (graphicOverlay == null) {
                     Log.d(TAG, "resume: graphOverlay is null");
                 }
-                preview.start(CameraSource, graphicOverlay);
+                preview.start(cameraSource, graphicOverlay);
             } catch (IOException e) {
                 Log.e(TAG, "Unable to start camera source.", e);
-                CameraSource.release();
-                CameraSource = null;
+                cameraSource.release();
+                cameraSource = null;
             }
         }
     }
