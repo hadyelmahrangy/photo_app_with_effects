@@ -7,13 +7,21 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -139,7 +147,7 @@ public class ResultActivity extends BaseActivity {
 
     private void getPhoto() {
         photoUri = getIntent().getParcelableExtra(KEY_IMAGE_URI);
-        ivPhoto.setImageURI(photoUri);
+        loadPhoto();
     }
 
     @Override
@@ -368,5 +376,22 @@ public class ResultActivity extends BaseActivity {
         v.layout(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
         v.draw(c);
         return b;
+    }
+
+    private void loadPhoto() {
+        Glide.with(this)
+                .asBitmap()
+                .load(photoUri)
+                .apply(new RequestOptions()
+                        .dontTransform()
+                        .diskCacheStrategy(DiskCacheStrategy.NONE))
+                .into(new BitmapImageViewTarget(ivPhoto) {
+                    @Override
+                    public void onResourceReady(Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        if (!ResultActivity.this.isFinishing() && resource != null) {
+                            ivPhoto.setImageBitmap(resource);
+                        }
+                    }
+                });
     }
 }

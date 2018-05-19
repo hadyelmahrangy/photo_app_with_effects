@@ -16,6 +16,9 @@ package hadyelmahrangy.com.photoapp.camera;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -24,6 +27,7 @@ import android.widget.ImageView;
 
 import com.google.android.gms.common.annotation.KeepName;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import butterknife.BindView;
