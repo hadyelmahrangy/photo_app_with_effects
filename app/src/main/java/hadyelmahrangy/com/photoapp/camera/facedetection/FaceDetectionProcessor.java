@@ -46,6 +46,7 @@ public class FaceDetectionProcessor extends VisionProcessorBase<List<FirebaseVis
                         .setClassificationType(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
                         .setLandmarkType(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
                         .setTrackingEnabled(true)
+                        .setMinFaceSize(0.5f)
                         .build();
 
         detector = FirebaseVision.getInstance().getVisionFaceDetector(options);
