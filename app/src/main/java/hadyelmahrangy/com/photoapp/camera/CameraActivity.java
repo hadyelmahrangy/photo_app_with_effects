@@ -18,7 +18,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -141,7 +143,15 @@ public final class CameraActivity extends BaseActivity {
         cameraSource.takePicture(null, new CameraSource.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data) {
-                CapturePhotoUtils.savePhotoToFile(CameraActivity.this, data, new CapturePhotoUtils.SavePhotoToFileCallback() {
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                Bitmap face = BitmapFactory.decodeByteArray(data, 0, data.length, options);
+
+                preview.setDrawingCacheEnabled(true);
+                Bitmap overlay = preview.getDrawingCache();
+
+                Bitmap result = mergeBitmaps(face, overlay);
+
+                CapturePhotoUtils.savePhotoToFile(CameraActivity.this, result, new CapturePhotoUtils.SavePhotoToFileCallback() {
                     @Override
                     public void onSaveSuccess(Uri uri) {
                         ResultActivity.launch(CameraActivity.this, uri);
@@ -154,6 +164,37 @@ public final class CameraActivity extends BaseActivity {
                 });
             }
         });
+    }
+
+    public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // "RECREATE" THE NEW BITMAP
+        Bitmap resizedBitmap = Bitmap.createBitmap(
+                bm, 0, 0, width, height, matrix, false);
+        return resizedBitmap;
+    }
+
+    public Bitmap mergeBitmaps(Bitmap face, Bitmap overlay) {
+        int width = face.getWidth();
+        int height = face.getHeight();
+        Bitmap newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        Rect faceRect = new Rect(0,0,width,height);
+        Rect overlayRect = new Rect(0,0,overlay.getWidth(),overlay.getHeight());
+
+        // Draw face and then overlay (Make sure rects are as needed)
+        Canvas canvas = new Canvas(newBitmap);
+        canvas.drawBitmap(face, faceRect, faceRect, null);
+        canvas.drawBitmap(overlay, overlayRect, faceRect, null);
+        return newBitmap;
     }
 
     @OnClick(R.id.iv_open_gallery)
