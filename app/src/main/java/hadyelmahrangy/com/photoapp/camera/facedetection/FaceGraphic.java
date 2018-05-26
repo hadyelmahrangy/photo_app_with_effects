@@ -74,7 +74,7 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
         boxPaint.setStyle(Paint.Style.STROKE);
         boxPaint.setStrokeWidth(BOX_STROKE_WIDTH);
 
-        faceBitmap = BitmapFactory.decodeResource(PhotoApplication.getContext().getResources(), R.drawable.ic_hijabs_2);
+        faceBitmap = BitmapFactory.decodeResource(PhotoApplication.getContext().getResources(), R.drawable.xxx);
     }
 
     /**
