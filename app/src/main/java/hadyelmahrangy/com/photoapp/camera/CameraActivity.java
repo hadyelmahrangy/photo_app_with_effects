@@ -69,6 +69,7 @@ public final class CameraActivity extends BaseActivity {
 
     private CameraSource cameraSource = null;
     private boolean isBackMode = true;
+    private boolean isFlash = false;
 
     @Override
     protected void onViewReady() {
@@ -116,6 +117,9 @@ public final class CameraActivity extends BaseActivity {
             } else {
                 cameraSource.setFacing(CameraSource.CAMERA_FACING_FRONT);
             }
+            isFlash = false;
+            cameraSource.setFlashCamera(false);
+            ivFlash.setChecked(false);
         }
         preview.stop();
         startCameraSource();
@@ -123,7 +127,13 @@ public final class CameraActivity extends BaseActivity {
 
     @OnClick(R.id.iv_flash)
     public void swapFlashClick() {
-        //TODO
+        if (cameraSource != null) {
+            boolean wasChanged = cameraSource.setFlashCamera(!isFlash);
+            if (wasChanged) {
+                isFlash = !isFlash;
+                ivFlash.setChecked(isBackMode);
+            }
+        }
     }
 
     @OnClick(R.id.iv_create_photo)

@@ -72,6 +72,7 @@ public class CameraSource {
     private Camera camera;
 
     protected int facing = CAMERA_FACING_BACK;
+    public String flashMode = Camera.Parameters.FLASH_MODE_ON;
 
     /**
      * Rotation of the device, and thus the associated preview images captured from the device. See
@@ -254,6 +255,40 @@ public class CameraSource {
         this.facing = facing;
     }
 
+    public synchronized boolean setFlashCamera(boolean isEnable) {
+        if (isEnable) {
+            boolean supported = isSupportedFlashMode(camera, Camera.Parameters.FLASH_MODE_ON);
+
+            if (supported) {
+                flashMode = Camera.Parameters.FLASH_MODE_ON;
+                Camera.Parameters params = camera.getParameters();
+                params.setFlashMode(flashMode);
+                camera.setParameters(params);
+                return true;
+            }
+        } else {
+            boolean supported = isSupportedFlashMode(camera, Camera.Parameters.FLASH_MODE_OFF);
+            if (supported) {
+                flashMode = Camera.Parameters.FLASH_MODE_OFF;
+                Camera.Parameters params = camera.getParameters();
+                params.setFlashMode(flashMode);
+                camera.setParameters(params);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isSupportedFlashMode(Camera camera, String mode) {
+        if (camera.getParameters() == null || camera.getParameters().getSupportedFlashModes() == null) return false;
+        for (String flashMode : camera.getParameters().getSupportedFlashModes()) {
+            if (flashMode.equals(mode)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Returns the preview size that is currently in use by the underlying camera.
      */
@@ -295,7 +330,9 @@ public class CameraSource {
         }
 
         Camera.Parameters parameters = camera.getParameters();
-
+        if (isSupportedFlashMode(camera, flashMode)) {
+            parameters.setFlashMode(flashMode);
+        }
         if (pictureSize != null) {
             parameters.setPictureSize(pictureSize.getWidth(), pictureSize.getHeight());
         }
@@ -307,16 +344,15 @@ public class CameraSource {
 
         setRotation(camera, parameters, requestedCameraId);
 
-        if (requestedAutoFocus) {
-            if (parameters
-                    .getSupportedFocusModes()
-                    .contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
-                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
-            } else {
-                Log.i(TAG, "Camera auto focus is not supported on this device.");
+            if (requestedAutoFocus) {
+                if (parameters
+                        .getSupportedFocusModes()
+                        .contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
+                    parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+                } else {
+                    Log.i(TAG, "Camera auto focus is not supported on this device.");
+                }
             }
-        }
-
         camera.setParameters(parameters);
 
         // Four frame buffers are needed for working with the camera:
