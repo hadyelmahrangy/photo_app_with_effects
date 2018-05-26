@@ -152,7 +152,7 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
         drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EYE);
         drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_MOUTH);
 
-        canvas.drawBitmap(faceBitmap, null, new RectF(left, top, right, bottom), null);
+        canvas.drawBitmap(faceBitmap, null, new RectF(left+50, top-50, right-50, bottom+450), null);
     }
 
     private void drawLandmarkPosition(Canvas canvas, FirebaseVisionFace face, int landmarkID) {
