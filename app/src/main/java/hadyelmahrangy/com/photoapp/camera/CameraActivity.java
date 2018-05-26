@@ -21,9 +21,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.media.ExifInterface;
 import android.util.Log;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -148,25 +148,7 @@ public final class CameraActivity extends BaseActivity {
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 Bitmap face = BitmapFactory.decodeByteArray(data, 0, data.length, options);
 
-
-                ExifInterface exifInterface = null;
-                try {
-                    exifInterface = new ExifInterface(new ByteArrayInputStream(data));
-
-                int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
-                int rotationDegrees = 0;
-                switch (orientation) {
-                    case ExifInterface.ORIENTATION_ROTATE_90:
-                        rotationDegrees = 90;
-                        break;
-                    case ExifInterface.ORIENTATION_ROTATE_180:
-                        rotationDegrees = 180;
-                        break;
-                    case ExifInterface.ORIENTATION_ROTATE_270:
-                        rotationDegrees = 270;
-                        break;
-                }
-
+                int rotationDegrees = getRotateDegrees(new ByteArrayInputStream(data));
 
                 preview.setDrawingCacheEnabled(true);
                 Bitmap overlay = preview.getDrawingCache();
@@ -187,11 +169,33 @@ public final class CameraActivity extends BaseActivity {
                     }
                 });
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
         });
+    }
+
+    private int getRotateDegrees(ByteArrayInputStream byteArrayInputStream) {
+        ExifInterface exifInterface = null;
+        int rotationDegrees = 0;
+        try {
+            exifInterface = new ExifInterface(byteArrayInputStream);
+
+            int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotationDegrees = 90;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotationDegrees = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotationDegrees = 270;
+                    break;
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return rotationDegrees;
     }
 
     public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
