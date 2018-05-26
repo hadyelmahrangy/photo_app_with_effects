@@ -153,9 +153,9 @@ public final class CameraActivity extends BaseActivity {
                 preview.setDrawingCacheEnabled(true);
                 Bitmap overlay = preview.getDrawingCache();
 
+                face = rotate(face, rotationDegrees);
+                overlay = rotate(overlay, rotationDegrees);
                 Bitmap result = mergeBitmaps(face, overlay);
-                result = rotate(result, rotationDegrees);
-
 
                 CapturePhotoUtils.savePhotoToFile(CameraActivity.this, result, new CapturePhotoUtils.SavePhotoToFileCallback() {
                     @Override
