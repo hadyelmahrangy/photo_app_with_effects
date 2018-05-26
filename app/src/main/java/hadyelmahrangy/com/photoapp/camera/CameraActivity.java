@@ -21,6 +21,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -29,6 +30,7 @@ import android.widget.ImageView;
 
 import com.google.android.gms.common.annotation.KeepName;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -146,10 +148,32 @@ public final class CameraActivity extends BaseActivity {
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 Bitmap face = BitmapFactory.decodeByteArray(data, 0, data.length, options);
 
+
+                ExifInterface exifInterface = null;
+                try {
+                    exifInterface = new ExifInterface(new ByteArrayInputStream(data));
+
+                int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+                int rotationDegrees = 0;
+                switch (orientation) {
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        rotationDegrees = 90;
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        rotationDegrees = 180;
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        rotationDegrees = 270;
+                        break;
+                }
+
+
                 preview.setDrawingCacheEnabled(true);
                 Bitmap overlay = preview.getDrawingCache();
 
                 Bitmap result = mergeBitmaps(face, overlay);
+                result = rotate(result, rotationDegrees);
+
 
                 CapturePhotoUtils.savePhotoToFile(CameraActivity.this, result, new CapturePhotoUtils.SavePhotoToFileCallback() {
                     @Override
@@ -162,6 +186,10 @@ public final class CameraActivity extends BaseActivity {
                         showMessage(error);
                     }
                 });
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -181,6 +209,18 @@ public final class CameraActivity extends BaseActivity {
                 bm, 0, 0, width, height, matrix, false);
         return resizedBitmap;
     }
+
+    public static Bitmap rotate(Bitmap bitmap, int degree) {
+        int w = bitmap.getWidth();
+        int h = bitmap.getHeight();
+
+        Matrix mtx = new Matrix();
+        //       mtx.postRotate(degree);
+        mtx.setRotate(degree);
+
+        return Bitmap.createBitmap(bitmap, 0, 0, w, h, mtx, true);
+    }
+
 
     public Bitmap mergeBitmaps(Bitmap face, Bitmap overlay) {
         int width = face.getWidth();
