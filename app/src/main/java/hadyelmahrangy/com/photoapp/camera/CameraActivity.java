@@ -214,15 +214,11 @@ public final class CameraActivity extends BaseActivity {
         return resizedBitmap;
     }
 
-    public static Bitmap rotate(Bitmap bitmap, int degree) {
-        int w = bitmap.getWidth();
-        int h = bitmap.getHeight();
-
-        Matrix mtx = new Matrix();
-        //       mtx.postRotate(degree);
-        mtx.setRotate(degree);
-
-        return Bitmap.createBitmap(bitmap, 0, 0, w, h, mtx, true);
+    public static Bitmap rotate(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
+                matrix, true);
     }
 
 
