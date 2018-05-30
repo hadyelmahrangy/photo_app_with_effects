@@ -18,8 +18,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.RectF;
+import android.util.Log;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.firebase.ml.vision.common.FirebaseVisionPoint;
@@ -51,8 +55,14 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
     private final Paint facePositionPaint;
     private final Paint idPaint;
     private final Paint boxPaint;
+    private double angle;
 
     private volatile FirebaseVisionFace firebaseVisionFace;
+
+    private PointF pointLeftZero = new PointF();
+    private PointF pointRightZero = new PointF();
+    private Vector vectorEye = new Vector();
+    private Vector vectorZero = new Vector();
 
     private Bitmap faceBitmap;
 
@@ -74,7 +84,7 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
         boxPaint.setStyle(Paint.Style.STROKE);
         boxPaint.setStrokeWidth(BOX_STROKE_WIDTH);
 
-        faceBitmap = BitmapFactory.decodeResource(PhotoApplication.getContext().getResources(), R.drawable.xxx);
+        faceBitmap = BitmapFactory.decodeResource(PhotoApplication.getContext().getResources(), R.drawable.icon_test1);
     }
 
     /**
@@ -100,9 +110,9 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
         // Draws a circle at the position of the detected face, with the face's track id below.
         float x = translateX(face.getBoundingBox().centerX());
         float y = translateY(face.getBoundingBox().centerY());
-        canvas.drawCircle(x, y, FACE_POSITION_RADIUS, facePositionPaint);
-        canvas.drawText("id: " + face.getTrackingId(), x + ID_X_OFFSET, y + ID_Y_OFFSET, idPaint);
-        canvas.drawText(
+//      canvas.drawCircle(x, y, FACE_POSITION_RADIUS, facePositionPaint);
+//        canvas.drawText("id: " + face.getTrackingId(), x + ID_X_OFFSET, y + ID_Y_OFFSET, idPaint);
+       /*   canvas.drawText(
                 "happiness: " + String.format("%.2f", face.getSmilingProbability()),
                 x + ID_X_OFFSET * 3,
                 y - ID_Y_OFFSET,
@@ -130,7 +140,7 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
                     y,
                     idPaint);
         }
-
+*/
         // Draws a bounding box around the face.
         float xOffset = scaleX(face.getBoundingBox().width() / 2.0f);
         float yOffset = scaleY(face.getBoundingBox().height() / 2.0f);
@@ -138,21 +148,62 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
         float top = y - yOffset;
         float right = x + xOffset;
         float bottom = y + yOffset;
-        canvas.drawRect(left, top, right, bottom, boxPaint);
+//        canvas.drawRect(left, top, right, bottom, boxPaint);
 
 //        // draw landmarks
-        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.BOTTOM_MOUTH);
+     /*   drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.BOTTOM_MOUTH);
         drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_CHEEK);
         drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_EAR);
         drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_MOUTH);
-        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_EYE);
+
         drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.NOSE_BASE);
         drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_CHEEK);
         drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EAR);
-        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EYE);
-        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_MOUTH);
 
-        canvas.drawBitmap(faceBitmap, null, new RectF(left+50, top-50, right-50, bottom+450), null);
+        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_MOUTH);*/
+        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_EYE);
+        drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EYE);
+
+        FirebaseVisionFaceLandmark landmarkLeft = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
+        FirebaseVisionFaceLandmark landmarkRight = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
+        if (landmarkLeft != null && landmarkRight != null) {
+            FirebaseVisionPoint pointLeft = landmarkLeft.getPosition();
+            FirebaseVisionPoint pointRight = landmarkRight.getPosition();
+
+            float minX = Math.min(pointLeft.getX(), pointRight.getX());
+            float maxX = Math.max(pointLeft.getX(), pointRight.getX());
+            float minY = Math.min(pointLeft.getY(), pointRight.getY());
+
+            pointLeftZero.set(minX, minY);
+            pointRightZero.set(maxX, minY);
+
+            vectorEye.set(pointRight.getX() - pointLeft.getX(),
+                    pointRight.getY() - pointLeft.getY());
+            vectorZero.set(pointRightZero.x - pointLeftZero.x,
+                    pointRightZero.y - pointLeftZero.y);
+
+            float multiplyVector = vectorEye.x * vectorZero.x + vectorEye.y * vectorZero.y;
+
+            double absVectorEye = Math.sqrt(Math.pow(vectorEye.x, 2) + Math.pow(vectorEye.y, 2));
+            double absVectorZero = Math.sqrt(Math.pow(vectorZero.x, 2) + Math.pow(vectorZero.y, 2));
+
+            double localAlpha = multiplyVector / (absVectorEye * absVectorZero);
+
+            double angleA = Math.acos(localAlpha);
+            double angleValue = Math.toDegrees(angleA);
+            if (angle != angleValue) {
+                angle = angleValue;
+            }
+            Log.e("ALPHA ", "alphaCos = " + localAlpha + "alphaACos = " + angleA + "angleValue = " + angleValue);
+        }
+
+        Matrix matrix = new Matrix();
+        matrix.mapRect(new RectF(left + 50, top - 50, right - 50, bottom + 450));
+        matrix.setRotate(0, faceBitmap.getWidth() / 2, faceBitmap.getHeight()/2);
+        canvas.drawBitmap(faceBitmap, matrix,null);
+//        canvas.drawBitmap(faceBitmap, null, new RectF(left+50, top-50, right-50, bottom+450), null);
+
+
     }
 
     private void drawLandmarkPosition(Canvas canvas, FirebaseVisionFace face, int landmarkID) {
