@@ -1,4 +1,4 @@
-package hadyelmahrangy.com.photoapp.imageEditor.adapters;
+package hadyelmahrangy.com.photoapp.imageEditor.adapters.hajib;
 
 import android.content.Context;
 import android.net.Uri;
@@ -17,6 +17,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import hadyelmahrangy.com.photoapp.R;
 import hadyelmahrangy.com.photoapp.imageEditor.ImageEditorActivity;
+import hadyelmahrangy.com.photoapp.imageEditor.adapters.hajib.HajibAdapter;
 
 public class HajibViewHolder extends RecyclerView.ViewHolder {
 

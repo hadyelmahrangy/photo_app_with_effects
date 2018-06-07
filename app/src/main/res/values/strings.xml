@@ -30,5 +30,18 @@
     <string name="facebook_package">com.facebook.katana</string>
     <string name="whatsapp_package">com.whatsapp</string>
 
-
+    <!--Filters -->
+    <string name="normal">Normal</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="blackwhite">Black&#38;White</string>
+    <string name="lordk">Lord Kelvin</string>
+    <string name="f1977">1977</string>
+    <string name="brannan">Brannan</string>
+    <string name="hefe">HEFE</string>
+    <string name="nashville">Nashville</string>
+    <string name="xpro2">X-PRO II</string>
+    <string name="amatorka">Amatorka</string>
+    <string name="miss_etikate">Miss Etikate</string>
+    <string name="soft_elegance">Soft Elegance</string>
+    <string name="gotham">Gotham</string>
 </resources>

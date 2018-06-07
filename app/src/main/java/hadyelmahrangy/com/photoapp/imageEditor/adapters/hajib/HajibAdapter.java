@@ -1,4 +1,4 @@
-package hadyelmahrangy.com.photoapp.imageEditor.adapters;
+package hadyelmahrangy.com.photoapp.imageEditor.adapters.hajib;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

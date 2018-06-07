@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="filters_names">
+        <item>@string/normal</item>
+        <item>@string/blackwhite</item>
+        <item>@string/gotham</item>
+        <item>@string/lordk</item>
+        <item>@string/f1977</item>
+        <item>@string/brannan</item>
+        <item>@string/hefe</item>
+        <item>@string/nashville</item>
+        <item>@string/xpro2</item>
+        <item>@string/amatorka</item>
+        <item>@string/miss_etikate</item>
+        <item>@string/soft_elegance</item>
+    </string-array>
+
     <string-array name="emoji">
         <item>"😀"</item>
         <item>"😁"</item>

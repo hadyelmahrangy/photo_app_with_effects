@@ -42,6 +42,9 @@ dependencies {
     //emoji
     implementation 'com.github.hani-momanii:SuperNova-Emoji:1.1'
 
+    //filters
+    compile 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
+
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     testImplementation 'junit:junit:4.12'

@@ -9,26 +9,27 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.Visibility;
-import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.ImageView;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 import hadyelmahrangy.com.photoapp.BaseActivity;
 import hadyelmahrangy.com.photoapp.R;
-import hadyelmahrangy.com.photoapp.imageEditor.adapters.EmojisAdapter;
-import hadyelmahrangy.com.photoapp.imageEditor.adapters.HajibAdapter;
+import hadyelmahrangy.com.photoapp.imageEditor.adapters.emoji.EmojisAdapter;
+import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.ImageFilterClickListener;
+import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.ImageFiltersAdapter;
+import hadyelmahrangy.com.photoapp.imageEditor.adapters.hajib.HajibAdapter;
 import hadyelmahrangy.com.photoapp.result.ResultActivity;
+import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
 
 public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.EmojisAdapterListener,
-        HajibAdapter.BordersAdapterListener {
+        HajibAdapter.BordersAdapterListener,
+        ImageFilterClickListener {
     private static final String KEY_IMAGE_URI = "key_image_uri";
 
     public static final String ASSETS_HAJIB = "hajib";
@@ -46,9 +47,6 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
     @BindView(R.id.bottom_container)
     View bottomContainer;
 
-    @BindView(R.id.iv_filters)
-    ImageView ivFilters;
-
     @BindView(R.id.photo_edit_iv)
     ImageView ivPhotoEdit;
 
@@ -58,8 +56,12 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
     @BindView(R.id.rec_view_hajib)
     RecyclerView recViewHajib;
 
+    @BindView(R.id.rec_view_filters)
+    RecyclerView recViewFilters;
+
     private EmojisAdapter emojisAdapter;
     private HajibAdapter hajibAdapter;
+    private ImageFiltersAdapter filtersAdapter;
 
     private Uri photoUri;
     int width;
@@ -99,6 +101,11 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
         selectTab(TAB_HAJIB);
     }
 
+    @OnClick(R.id.iv_filters)
+    void onFiltersClick() {
+        selectTab(TAB_FITERS);
+    }
+
     private void selectTab(int tab) {
         switch (tab) {
             case TAB_EMOJI:
@@ -117,14 +124,20 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
                     setLayoutsVisibility(View.GONE, View.GONE, View.GONE);
                 }
                 break;
-            //TODO FILTERS
+            case TAB_FITERS:
+                if (recViewFilters.getVisibility() == View.GONE) {
+                    setLayoutsVisibility(View.GONE, View.GONE, View.VISIBLE);
+                    initFiltersAdapter();
+                } else {
+                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE);
+                }
         }
     }
 
     private void setLayoutsVisibility(int tabEmojiVisibility, int tabHajibVisibility, int tabFiltersVisibility) {
         recViewEmojis.setVisibility(tabEmojiVisibility);
         recViewHajib.setVisibility(tabHajibVisibility);
-        //TODO FITERS
+        recViewFilters.setVisibility(tabFiltersVisibility);
     }
 
     private void getPhoto() {
@@ -160,6 +173,14 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
         }
     }
 
+    private void initFiltersAdapter() {
+        if (filtersAdapter == null) {
+            recViewFilters.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+            filtersAdapter = new ImageFiltersAdapter(this, this);
+            recViewFilters.setAdapter(filtersAdapter);
+        }
+    }
+
     @Override
     public void onEmojisClick(@NonNull String unicode) {
         setLayoutsVisibility(View.GONE, View.GONE, View.GONE);
@@ -169,6 +190,11 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
     @Override
     public void onClick(@NonNull String borderName) {
         setLayoutsVisibility(View.GONE, View.GONE, View.GONE);
+        //TODO
+    }
+
+    @Override
+    public void onFilterClick(GPUImageFilter filter) {
         //TODO
     }
 
