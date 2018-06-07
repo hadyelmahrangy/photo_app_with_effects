@@ -24,6 +24,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="paddingPercent" value="30" />
+                                                <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -34,7 +35,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/opt/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_arrow_back_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/Applications/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_arrow_forward_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -44,8 +45,8 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="ic_close_black" />
-                                      <entry key="theme" value="CUSTOM" />
+                                      <entry key="outputName" value="ic_arrow_right" />
+                                      <entry key="theme" value="HOLO_DARK" />
                                       <entry key="themeColor" value="000000" />
                                     </map>
                                   </option>

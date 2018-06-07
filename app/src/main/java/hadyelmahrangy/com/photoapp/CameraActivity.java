@@ -32,6 +32,7 @@ import hadyelmahrangy.com.photoapp.camera.CameraSource;
 import hadyelmahrangy.com.photoapp.camera.CameraSourcePreview;
 import hadyelmahrangy.com.photoapp.camera.GraphicOverlay;
 import hadyelmahrangy.com.photoapp.gallery.GalleryActivity;
+import hadyelmahrangy.com.photoapp.imageEditor.ImageEditorActivity;
 import hadyelmahrangy.com.photoapp.result.ResultActivity;
 import hadyelmahrangy.com.photoapp.util.CapturePhotoUtils;
 import hadyelmahrangy.com.photoapp.util.PermissionManager;
@@ -129,7 +130,8 @@ public class CameraActivity extends BaseActivity {
                 CapturePhotoUtils.savePhotoToFile(CameraActivity.this, data, new CapturePhotoUtils.SavePhotoToFileCallback() {
                     @Override
                     public void onSaveSuccess(Uri uri) {
-                        ResultActivity.launch(CameraActivity.this, uri);
+                        //    ResultActivity.launch(CameraActivity.this, uri);
+                        ImageEditorActivity.launch(CameraActivity.this, uri);
                     }
 
                     @Override
@@ -263,7 +265,8 @@ public class CameraActivity extends BaseActivity {
                 if (intent != null && intent.getData() != null) {
                     Uri uri = intent.getData();
                     if (uri != null) {
-                        ResultActivity.launch(this, uri);
+                        //ResultActivity.launch(this, uri);
+                        ImageEditorActivity.launch(this, uri);
                     }
                 }
             }
