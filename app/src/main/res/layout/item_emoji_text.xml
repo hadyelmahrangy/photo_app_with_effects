@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hani.momanii.supernova_emoji_library.Helper.EmojiconTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:emojicon="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/emoji"
+    android:layout_width="60dp"
+    android:layout_height="60dp"
+    android:layout_margin="6dp"
+    android:gravity="center"
+    android:padding="3dp"
+    emojicon:emojiconSize="40sp" />
