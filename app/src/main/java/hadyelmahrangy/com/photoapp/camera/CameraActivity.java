@@ -1,4 +1,4 @@
-package hadyelmahrangy.com.photoapp;
+package hadyelmahrangy.com.photoapp.camera;
 
 import android.Manifest;
 import android.app.Dialog;
@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 
@@ -21,16 +20,14 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.google.android.gms.vision.face.LargestFaceFocusingProcessor;
 
 import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import hadyelmahrangy.com.photoapp.camera.CameraFaceHelper;
-import hadyelmahrangy.com.photoapp.camera.CameraScaleListener;
-import hadyelmahrangy.com.photoapp.camera.CameraSource;
-import hadyelmahrangy.com.photoapp.camera.CameraSourcePreview;
-import hadyelmahrangy.com.photoapp.camera.GraphicOverlay;
+import hadyelmahrangy.com.photoapp.BaseActivity;
+import hadyelmahrangy.com.photoapp.R;
 import hadyelmahrangy.com.photoapp.gallery.GalleryActivity;
 import hadyelmahrangy.com.photoapp.imageEditor.ImageEditorActivity;
 import hadyelmahrangy.com.photoapp.result.ResultActivity;
@@ -179,8 +176,13 @@ public class CameraActivity extends BaseActivity {
                 .setMode(FaceDetector.ACCURATE_MODE)
                 .build();
 
-        detector.setProcessor(
+/*        detector.setProcessor(
                 new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory())
+                        .build());*/
+
+        detector.setProcessor(
+                new LargestFaceFocusingProcessor.Builder(detector,
+                        new CameraFaceHelper.GraphicFaceTracker(mGraphicOverlay, this))
                         .build());
 
         DisplayMetrics metrics = new DisplayMetrics();
@@ -188,8 +190,8 @@ public class CameraActivity extends BaseActivity {
 
         CameraSource.Builder cameraBuilder = new CameraSource.Builder(context, detector)
                 .setFacing(mCameraFacing)
-//                .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
-                .setRequestedFps(30.0f)
+                .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
+                .setRequestedFps(60.0f)
                 .setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)
                 .setFlashMode(mFlashState);
 
@@ -253,7 +255,6 @@ public class CameraActivity extends BaseActivity {
                     }
                 }
             }
-
         }
     }
 

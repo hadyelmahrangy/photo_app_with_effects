@@ -77,7 +77,7 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
         mBoxPaint.setStyle(Paint.Style.STROKE);
         mBoxPaint.setStrokeWidth(BOX_STROKE_WIDTH);
 
-        mBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_hijabs_2);
+        mBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon_mask);
 
     }
 
@@ -121,7 +121,7 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
         float top = y - yOffset;
         float right = x + xOffset;
         float bottom = y + yOffset;
-//        canvas.drawRect(left, top, right, bottom, mBoxPaint);
+        canvas.drawRect(left, top, right, bottom, mBoxPaint);
 
         canvas.drawBitmap(mBitmap, null,new RectF(left-60, top - 70, right + 50, bottom + 450), null);
     }
