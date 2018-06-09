@@ -47,8 +47,14 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
     @BindView(R.id.bottom_container)
     View bottomContainer;
 
+    @BindView(R.id.filters_container)
+    View filtersContainer;
+
     @BindView(R.id.photo_edit_iv)
     ImageView ivPhotoEdit;
+
+    @BindView(R.id.iv_next_screen)
+    ImageView ivNextScreen;
 
     @BindView(R.id.rec_view_emojis)
     RecyclerView recViewEmojis;
@@ -106,38 +112,49 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
         selectTab(TAB_FITERS);
     }
 
+    @OnClick(R.id.tv_close_filters)
+    void closeFilters() {
+        setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
+    }
+
     private void selectTab(int tab) {
         switch (tab) {
             case TAB_EMOJI:
                 if (recViewEmojis.getVisibility() == View.GONE) {
-                    setLayoutsVisibility(View.VISIBLE, View.GONE, View.GONE);
+                    setLayoutsVisibility(View.VISIBLE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
                     initEmojisAdapter();
                 } else {
-                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE);
+                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
                 }
                 break;
             case TAB_HAJIB:
                 if (recViewHajib.getVisibility() == View.GONE) {
-                    setLayoutsVisibility(View.GONE, View.VISIBLE, View.GONE);
+                    setLayoutsVisibility(View.GONE, View.VISIBLE, View.GONE, View.VISIBLE, View.VISIBLE);
                     initHajibAdapter();
                 } else {
-                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE);
+                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
                 }
                 break;
             case TAB_FITERS:
-                if (recViewFilters.getVisibility() == View.GONE) {
-                    setLayoutsVisibility(View.GONE, View.GONE, View.VISIBLE);
+                if (filtersContainer.getVisibility() == View.GONE) {
+                    setLayoutsVisibility(View.GONE, View.GONE, View.VISIBLE, View.GONE, View.GONE);
                     initFiltersAdapter();
                 } else {
-                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE);
+                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
                 }
         }
     }
 
-    private void setLayoutsVisibility(int tabEmojiVisibility, int tabHajibVisibility, int tabFiltersVisibility) {
+    private void setLayoutsVisibility(int tabEmojiVisibility,
+                                      int tabHajibVisibility,
+                                      int tabFiltersVisibility,
+                                      int bottomContainerVisibility,
+                                      int nextBtnVisibility) {
         recViewEmojis.setVisibility(tabEmojiVisibility);
         recViewHajib.setVisibility(tabHajibVisibility);
-        recViewFilters.setVisibility(tabFiltersVisibility);
+        filtersContainer.setVisibility(tabFiltersVisibility);
+        bottomContainer.setVisibility(bottomContainerVisibility);
+        ivNextScreen.setVisibility(nextBtnVisibility);
     }
 
     private void getPhoto() {
@@ -183,18 +200,19 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
 
     @Override
     public void onEmojisClick(@NonNull String unicode) {
-        setLayoutsVisibility(View.GONE, View.GONE, View.GONE);
+        setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
         //TODO
     }
 
     @Override
     public void onClick(@NonNull String borderName) {
-        setLayoutsVisibility(View.GONE, View.GONE, View.GONE);
+        setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
         //TODO
     }
 
     @Override
     public void onFilterClick(GPUImageFilter filter) {
+        setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
         //TODO
     }
 
