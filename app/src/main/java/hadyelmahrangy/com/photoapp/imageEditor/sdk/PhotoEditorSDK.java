@@ -2,6 +2,7 @@ package hadyelmahrangy.com.photoapp.imageEditor.sdk;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.ColorInt;
@@ -18,6 +19,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.zomato.photofilters.imageprocessors.Filter;
+import com.zomato.photofilters.imageprocessors.subfilters.BrightnessSubFilter;
+import com.zomato.photofilters.imageprocessors.subfilters.ContrastSubFilter;
+import com.zomato.photofilters.imageprocessors.subfilters.SaturationSubfilter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,17 +40,29 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
     private RelativeLayout parentView;
     private ImageView imageView;
     private View deleteView;
-    private BrushDrawingView brushDrawingView;
     private List<View> addedViews;
     private OnPhotoEditorSDKListener onPhotoEditorSDKListener;
-    private View addTextRootView;
+
+    //filters
+    //filters
+    Bitmap originalImage;
+    // to backup image with filter applied
+    Bitmap filteredImage;
+
+    // the final image after applying
+    // brightness, saturation, contrast
+    Bitmap finalImage;
+
+    // modified image values
+    int brightnessFinal = 0;
+    float saturationFinal = 1.0f;
+    float contrastFinal = 1.0f;
 
     private PhotoEditorSDK(PhotoEditorSDKBuilder photoEditorSDKBuilder) {
         this.context = photoEditorSDKBuilder.context;
         this.parentView = photoEditorSDKBuilder.parentView;
         this.imageView = photoEditorSDKBuilder.imageView;
         this.deleteView = photoEditorSDKBuilder.deleteView;
-        this.brushDrawingView = photoEditorSDKBuilder.brushDrawingView;
         addedViews = new ArrayList<>();
     }
 
@@ -97,62 +114,6 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
     }
 
 
-    public void setBrushDrawingMode(boolean brushDrawingMode) {
-        if (brushDrawingView != null)
-            brushDrawingView.setBrushDrawingMode(brushDrawingMode);
-    }
-
-    public void setBrushSize(float size) {
-        if (brushDrawingView != null)
-            brushDrawingView.setBrushSize(size);
-    }
-
-    public void setBrushColor(@ColorInt int color) {
-        if (brushDrawingView != null)
-            brushDrawingView.setBrushColor(color);
-    }
-
-    public void setBrushEraserSize(float brushEraserSize) {
-        if (brushDrawingView != null)
-            brushDrawingView.setBrushEraserSize(brushEraserSize);
-    }
-
-    public void setBrushEraserColor(@ColorInt int color) {
-        if (brushDrawingView != null)
-            brushDrawingView.setBrushEraserColor(color);
-    }
-
-    public float getEraserSize() {
-        if (brushDrawingView != null)
-            return brushDrawingView.getEraserSize();
-        return 0;
-    }
-
-    public float getBrushSize() {
-        if (brushDrawingView != null)
-            return brushDrawingView.getBrushSize();
-        return 0;
-    }
-
-    public int getBrushColor() {
-        if (brushDrawingView != null)
-            return brushDrawingView.getBrushColor();
-        return 0;
-    }
-
-    public void brushEraser() {
-        if (brushDrawingView != null)
-            brushDrawingView.brushEraser();
-    }
-
-    public void viewUndo() {
-        if (addedViews.size() > 0) {
-            parentView.removeView(addedViews.remove(addedViews.size() - 1));
-            if (onPhotoEditorSDKListener != null)
-                onPhotoEditorSDKListener.onRemoveViewListener(addedViews.size());
-        }
-    }
-
     private void viewUndo(View removedView) {
         if (addedViews.size() > 0) {
             if (addedViews.contains(removedView)) {
@@ -162,19 +123,6 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
                     onPhotoEditorSDKListener.onRemoveViewListener(addedViews.size());
             }
         }
-    }
-
-    public void clearBrushAllViews() {
-        if (brushDrawingView != null)
-            brushDrawingView.clearAll();
-    }
-
-    public void clearAllViews() {
-        for (int i = 0; i < addedViews.size(); i++) {
-            parentView.removeView(addedViews.get(i));
-        }
-        if (brushDrawingView != null)
-            brushDrawingView.clearAll();
     }
 
     public String saveImage(String folderName, String imageName) {
@@ -207,6 +155,64 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
         return selectedOutputPath;
     }
 
+    //filters
+    public void initFilters() {
+        originalImage = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        filteredImage = originalImage.copy(Bitmap.Config.ARGB_8888, true);
+        finalImage = originalImage.copy(Bitmap.Config.ARGB_8888, true);
+    }
+
+    public void resetFilters() {
+        brightnessFinal = 0;
+        saturationFinal = 1.0f;
+        contrastFinal = 1.0f;
+    }
+
+    public void onFilterSelected(Filter filter) {
+        // applying the selected filter
+        filteredImage = originalImage.copy(Bitmap.Config.ARGB_8888, true);
+        // preview filtered image
+        imageView.setImageBitmap(filter.processFilter(filteredImage));
+        finalImage = filteredImage.copy(Bitmap.Config.ARGB_8888, true);
+    }
+
+    public void onBrightnessChanged(int brightness) {
+        brightnessFinal = brightness;
+        Filter myFilter = new Filter();
+        myFilter.addSubFilter(new BrightnessSubFilter(brightness));
+        imageView.setImageBitmap(myFilter.processFilter(finalImage.copy(Bitmap.Config.ARGB_8888, true)));
+    }
+
+    public void onSaturationChanged(float saturation) {
+        saturationFinal = saturation;
+        Filter myFilter = new Filter();
+        myFilter.addSubFilter(new SaturationSubfilter(saturation));
+        imageView.setImageBitmap(myFilter.processFilter(finalImage.copy(Bitmap.Config.ARGB_8888, true)));
+    }
+
+    public void onContrastChanged(float contrast) {
+        contrastFinal = contrast;
+        Filter myFilter = new Filter();
+        myFilter.addSubFilter(new ContrastSubFilter(contrast));
+        imageView.setImageBitmap(myFilter.processFilter(finalImage.copy(Bitmap.Config.ARGB_8888, true)));
+    }
+
+    public void onEditCompleted() {
+        // once the editing is done i.e seekbar is drag is completed,
+        // apply the values on to filtered image
+        final Bitmap bitmap = filteredImage.copy(Bitmap.Config.ARGB_8888, true);
+
+        Filter myFilter = new Filter();
+        myFilter.addSubFilter(new BrightnessSubFilter(brightnessFinal));
+        myFilter.addSubFilter(new ContrastSubFilter(contrastFinal));
+        myFilter.addSubFilter(new SaturationSubfilter(saturationFinal));
+        finalImage = myFilter.processFilter(bitmap);
+    }
+
+    public Bitmap getOriginalImage() {
+        return originalImage;
+    }
+
     private boolean isSDCARDMounted() {
         String status = Environment.getExternalStorageState();
         return status.equals(Environment.MEDIA_MOUNTED);
@@ -233,32 +239,14 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
                 .into(imageView);
     }
 
-    private String convertEmoji(String emoji) {
-        String returnedEmoji = "";
-        try {
-            int convertEmojiToInt = Integer.parseInt(emoji.substring(2), 16);
-            returnedEmoji = getEmojiByUnicode(convertEmojiToInt);
-        } catch (NumberFormatException e) {
-            returnedEmoji = "";
-        }
-        return returnedEmoji;
-    }
-
-    private String getEmojiByUnicode(int unicode) {
-        return new String(Character.toChars(unicode));
-    }
 
     public void setOnPhotoEditorSDKListener(OnPhotoEditorSDKListener onPhotoEditorSDKListener) {
         this.onPhotoEditorSDKListener = onPhotoEditorSDKListener;
-       // brushDrawingView.setOnPhotoEditorSDKListener(onPhotoEditorSDKListener);
     }
 
     @Override
     public void onEditTextClickListener(String text, int colorCode) {
-        if (addTextRootView != null) {
-            parentView.removeView(addTextRootView);
-            addedViews.remove(addTextRootView);
-        }
+        //no-op
     }
 
     @Override
@@ -272,7 +260,6 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
         private RelativeLayout parentView;
         private ImageView imageView;
         private View deleteView;
-        private BrushDrawingView brushDrawingView;
 
         public PhotoEditorSDKBuilder(Context context) {
             this.context = context;
@@ -290,11 +277,6 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
 
         public PhotoEditorSDKBuilder deleteView(View deleteView) {
             this.deleteView = deleteView;
-            return this;
-        }
-
-        public PhotoEditorSDKBuilder brushDrawingView(BrushDrawingView brushDrawingView) {
-            this.brushDrawingView = brushDrawingView;
             return this;
         }
 

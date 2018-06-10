@@ -13,16 +13,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.zomato.photofilters.imageprocessors.Filter;
-import com.zomato.photofilters.imageprocessors.subfilters.BrightnessSubFilter;
-import com.zomato.photofilters.imageprocessors.subfilters.ContrastSubFilter;
-import com.zomato.photofilters.imageprocessors.subfilters.SaturationSubfilter;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -33,10 +29,10 @@ import butterknife.OnClick;
 import hadyelmahrangy.com.photoapp.BaseActivity;
 import hadyelmahrangy.com.photoapp.R;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.emoji.EmojisAdapter;
-import hadyelmahrangy.com.photoapp.imageEditor.adapters.hajib.HajibAdapter;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.EditImageFragment;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.FiltersListFragment;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.ViewPagerFiltersAdapter;
+import hadyelmahrangy.com.photoapp.imageEditor.adapters.hajib.HajibAdapter;
 import hadyelmahrangy.com.photoapp.imageEditor.sdk.OnPhotoEditorSDKListener;
 import hadyelmahrangy.com.photoapp.imageEditor.sdk.PhotoEditorSDK;
 import hadyelmahrangy.com.photoapp.imageEditor.sdk.ViewType;
@@ -53,25 +49,10 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
         System.loadLibrary("NativeImageProcessor");
     }
 
-    //filters
-    Bitmap originalImage;
-    // to backup image with filter applied
-    Bitmap filteredImage;
-
-    // the final image after applying
-    // brightness, saturation, contrast
-    Bitmap finalImage;
-
     FiltersListFragment filtersListFragment;
     EditImageFragment editImageFragment;
 
-    // modified image values
-    int brightnessFinal = 0;
-    float saturationFinal = 1.0f;
-    float contrastFinal = 1.0f;
-
     private static final String KEY_IMAGE_URI = "key_image_uri";
-
     public static final String ASSETS_HAJIB = "hajib";
 
     private static final int TAB_EMOJI = 0;
@@ -225,10 +206,6 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
     private void getPhoto() {
         photoUri = getIntent().getParcelableExtra(KEY_IMAGE_URI);
         ivPhotoEdit.setImageURI(photoUri);
-
-        originalImage = ((BitmapDrawable) ivPhotoEdit.getDrawable()).getBitmap();
-        filteredImage = originalImage.copy(Bitmap.Config.ARGB_8888, true);
-        finalImage = originalImage.copy(Bitmap.Config.ARGB_8888, true);
     }
 
     private void getScreenSize() {
@@ -291,6 +268,7 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
                 .buildPhotoEditorSDK();
 
         photoEditorSDK.setOnPhotoEditorSDKListener(this);
+        photoEditorSDK.initFilters();
     }
 
     @Override
@@ -353,68 +331,60 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
         if (editImageFragment != null) {
             editImageFragment.resetControls();
         }
-        brightnessFinal = 0;
-        saturationFinal = 1.0f;
-        contrastFinal = 1.0f;
+        if (photoEditorSDK != null) {
+            photoEditorSDK.resetFilters();
+        }
     }
 
     @Override
     public void onFilterSelected(Filter filter) {
         // reset image controls
         resetControls();
-
-        // applying the selected filter
-        filteredImage = originalImage.copy(Bitmap.Config.ARGB_8888, true);
-        // preview filtered image
-        ivPhotoEdit.setImageBitmap(filter.processFilter(filteredImage));
-
-        finalImage = filteredImage.copy(Bitmap.Config.ARGB_8888, true);
+        if (photoEditorSDK != null) {
+            photoEditorSDK.onFilterSelected(filter);
+        }
     }
 
     @Override
     public void onBrightnessChanged(int brightness) {
-        brightnessFinal = brightness;
-        Filter myFilter = new Filter();
-        myFilter.addSubFilter(new BrightnessSubFilter(brightness));
-        ivPhotoEdit.setImageBitmap(myFilter.processFilter(finalImage.copy(Bitmap.Config.ARGB_8888, true)));
+        if (photoEditorSDK != null) {
+            photoEditorSDK.onBrightnessChanged(brightness);
+        }
+
     }
 
     @Override
     public void onSaturationChanged(float saturation) {
-        saturationFinal = saturation;
-        Filter myFilter = new Filter();
-        myFilter.addSubFilter(new SaturationSubfilter(saturation));
-        ivPhotoEdit.setImageBitmap(myFilter.processFilter(finalImage.copy(Bitmap.Config.ARGB_8888, true)));
+        if (photoEditorSDK != null) {
+            photoEditorSDK.onSaturationChanged(saturation);
+        }
     }
 
     @Override
     public void onContrastChanged(float contrast) {
-        contrastFinal = contrast;
-        Filter myFilter = new Filter();
-        myFilter.addSubFilter(new ContrastSubFilter(contrast));
-        ivPhotoEdit.setImageBitmap(myFilter.processFilter(finalImage.copy(Bitmap.Config.ARGB_8888, true)));
+        if (photoEditorSDK != null) {
+            photoEditorSDK.onContrastChanged(contrast);
+        }
     }
 
     @Override
     public void onEditStarted() {
-        //TODO
+       //no-op
     }
 
     @Override
     public void onEditCompleted() {
-        // once the editing is done i.e seekbar is drag is completed,
-        // apply the values on to filtered image
-        final Bitmap bitmap = filteredImage.copy(Bitmap.Config.ARGB_8888, true);
-
-        Filter myFilter = new Filter();
-        myFilter.addSubFilter(new BrightnessSubFilter(brightnessFinal));
-        myFilter.addSubFilter(new ContrastSubFilter(contrastFinal));
-        myFilter.addSubFilter(new SaturationSubfilter(saturationFinal));
-        finalImage = myFilter.processFilter(bitmap);
+        if (photoEditorSDK != null) {
+            photoEditorSDK.onEditCompleted();
+        }
     }
 
     @NonNull
     public Bitmap getOriginalImage() {
-        return originalImage;
+        if (photoEditorSDK != null) {
+            return photoEditorSDK.getOriginalImage();
+        } else {
+            return ((BitmapDrawable) ivPhotoEdit.getDrawable()).getBitmap();
+        }
     }
 }
