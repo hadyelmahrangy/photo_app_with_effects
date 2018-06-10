@@ -45,4 +45,13 @@
     <string name="miss_etikate">Miss Etikate</string>
     <string name="soft_elegance">Soft Elegance</string>
     <string name="gotham">Gotham</string>
+
+    <string name="lbl_brightness">BRIGHTNESS</string>
+    <string name="lbl_contrast">CONTRAST</string>
+    <string name="lbl_saturation">SATURATION</string>
+    <string name="tab_filters">FILTERS</string>
+    <string name="tab_edit">EDIT</string>
+
+    <string name="filter_normal">Normal</string>
+
 </resources>

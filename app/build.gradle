@@ -43,7 +43,9 @@ dependencies {
     implementation 'com.github.hani-momanii:SuperNova-Emoji:1.1'
 
     //filters
-    compile 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
+    implementation 'info.androidhive:imagefilters:1.0.7'
+    // dexter M permissions
+    implementation 'com.karumi:dexter:4.1.0'
 
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'

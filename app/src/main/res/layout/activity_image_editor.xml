@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black">
@@ -128,9 +129,9 @@
     <LinearLayout
         android:id="@+id/filters_container"
         android:layout_width="match_parent"
-        android:layout_height="145dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/black_175"
+        android:background="@color/white"
         android:orientation="vertical"
         android:visibility="gone">
 
@@ -143,14 +144,22 @@
             android:padding="10dp"
             android:text="@string/close"
             android:textAllCaps="true"
-            android:textColor="@color/white" />
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="@color/black" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rec_view_filters"
+        <hadyelmahrangy.com.photoapp.util.NonSwipeableViewPager
+            android:id="@+id/view_pager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:scrollbars="none" />
+            android:layout_height="120dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabGravity="fill"
+            app:tabMode="fixed" />
     </LinearLayout>
 
 </RelativeLayout>
