@@ -250,7 +250,7 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
 
     public void setOnPhotoEditorSDKListener(OnPhotoEditorSDKListener onPhotoEditorSDKListener) {
         this.onPhotoEditorSDKListener = onPhotoEditorSDKListener;
-        brushDrawingView.setOnPhotoEditorSDKListener(onPhotoEditorSDKListener);
+       // brushDrawingView.setOnPhotoEditorSDKListener(onPhotoEditorSDKListener);
     }
 
     @Override

@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.ImageView;
@@ -36,11 +37,16 @@ import hadyelmahrangy.com.photoapp.imageEditor.adapters.hajib.HajibAdapter;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.EditImageFragment;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.FiltersListFragment;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.ViewPagerFiltersAdapter;
+import hadyelmahrangy.com.photoapp.imageEditor.sdk.OnPhotoEditorSDKListener;
 import hadyelmahrangy.com.photoapp.imageEditor.sdk.PhotoEditorSDK;
+import hadyelmahrangy.com.photoapp.imageEditor.sdk.ViewType;
 import hadyelmahrangy.com.photoapp.result.ResultActivity;
 
 public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.EmojisAdapterListener,
-        HajibAdapter.BordersAdapterListener, FiltersListFragment.FiltersListFragmentListener, EditImageFragment.EditImageFragmentListener {
+        HajibAdapter.BordersAdapterListener,
+        FiltersListFragment.FiltersListFragmentListener,
+        EditImageFragment.EditImageFragmentListener,
+        OnPhotoEditorSDKListener {
 
     // load native image filters library
     static {
@@ -210,6 +216,12 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
         ivNextScreen.setVisibility(nextBtnVisibility);
     }
 
+    private void setLayoutsVisibility(int bottomContainerVisibility,
+                                      int nextBtnVisibility) {
+        bottomContainer.setVisibility(bottomContainerVisibility);
+        ivNextScreen.setVisibility(nextBtnVisibility);
+    }
+
     private void getPhoto() {
         photoUri = getIntent().getParcelableExtra(KEY_IMAGE_URI);
         ivPhotoEdit.setImageURI(photoUri);
@@ -277,6 +289,35 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
                 .childView(ivPhotoEdit)
                 .deleteView(ivDeleteViewFromPhoto)
                 .buildPhotoEditorSDK();
+
+        photoEditorSDK.setOnPhotoEditorSDKListener(this);
+    }
+
+    @Override
+    public void onEditTextChangeListener(String text, int colorCode) {
+        //no-op
+    }
+
+    @Override
+    public void onAddViewListener(ViewType viewType, int numberOfAddedViews) {
+        //no-op
+    }
+
+    @Override
+    public void onRemoveViewListener(int numberOfAddedViews) {
+        //no-op
+    }
+
+    @Override
+    public void onStartViewChangeListener(ViewType viewType) {
+        setLayoutsVisibility(View.GONE, View.GONE);
+
+    }
+
+    @Override
+    public void onStopViewChangeListener(ViewType viewType) {
+        setLayoutsVisibility(View.VISIBLE, View.VISIBLE);
+
     }
 
     //Fiters
