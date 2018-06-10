@@ -1,10 +1,11 @@
-package com.ahmedadeltito.photoeditorsdk;
+package hadyelmahrangy.com.photoapp.imageEditor.sdk;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -14,14 +15,19 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-/**
- * Created by Ahmed Adel on 02/06/2017.
- */
+import hadyelmahrangy.com.photoapp.R;
+import hadyelmahrangy.com.photoapp.imageEditor.ImageEditorActivity;
+import hani.momanii.supernova_emoji_library.Helper.EmojiconTextView;
 
 public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
 
@@ -43,66 +49,53 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
         addedViews = new ArrayList<>();
     }
 
-    public void addImage(Bitmap desiredImage) {
+    public void addImage(String hajibName) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View imageRootView = inflater.inflate(R.layout.photo_editor_sdk_image_item_list, null);
-        ImageView imageView = (ImageView) imageRootView.findViewById(R.id.photo_editor_sdk_image_iv);
-        imageView.setImageBitmap(desiredImage);
+        ImageView imageView = imageRootView.findViewById(R.id.photo_editor_sdk_image_iv);
+        loadImage(Uri.parse("file:///android_asset/" + ImageEditorActivity.ASSETS_HAJIB + "/" + hajibName), imageView, 300);
+
         imageView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT));
         MultiTouchListener multiTouchListener = new MultiTouchListener(deleteView,
                 parentView, this.imageView, onPhotoEditorSDKListener);
         multiTouchListener.setOnMultiTouchListener(this);
         imageRootView.setOnTouchListener(multiTouchListener);
+
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+
         parentView.addView(imageRootView, params);
         addedViews.add(imageRootView);
         if (onPhotoEditorSDKListener != null)
             onPhotoEditorSDKListener.onAddViewListener(ViewType.IMAGE, addedViews.size());
     }
 
-    public void addText(String text, int colorCodeTextView) {
+    public void addEmoji(String emojiName) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        addTextRootView = inflater.inflate(R.layout.photo_editor_sdk_text_item_list, null);
-        TextView addTextView = (TextView) addTextRootView.findViewById(R.id.photo_editor_sdk_text_tv);
-        addTextView.setGravity(Gravity.CENTER);
-        addTextView.setText(text);
-        if (colorCodeTextView != -1)
-            addTextView.setTextColor(colorCodeTextView);
-        MultiTouchListener multiTouchListener = new MultiTouchListener(deleteView,
-                parentView, this.imageView, onPhotoEditorSDKListener);
-        multiTouchListener.setOnMultiTouchListener(this);
-        addTextRootView.setOnTouchListener(multiTouchListener);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-        parentView.addView(addTextRootView, params);
-        addedViews.add(addTextRootView);
-        if (onPhotoEditorSDKListener != null)
-            onPhotoEditorSDKListener.onAddViewListener(ViewType.TEXT, addedViews.size());
-    }
+        View emojiRootView = inflater.inflate(R.layout.photo_editor_sdk_emoji_item_list, null);
 
-    public void addEmoji(String emojiName, Typeface emojiFont) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View emojiRootView = inflater.inflate(R.layout.photo_editor_sdk_text_item_list, null);
-        TextView emojiTextView = (TextView) emojiRootView.findViewById(R.id.photo_editor_sdk_text_tv);
-        emojiTextView.setTypeface(emojiFont);
+        EmojiconTextView emojiTextView = emojiRootView.findViewById(R.id.emoji);
         emojiTextView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        emojiTextView.setText(convertEmoji(emojiName));
+        emojiTextView.setText(emojiName);
+
         MultiTouchListener multiTouchListener = new MultiTouchListener(deleteView,
                 parentView, this.imageView, onPhotoEditorSDKListener);
         multiTouchListener.setOnMultiTouchListener(this);
         emojiRootView.setOnTouchListener(multiTouchListener);
+
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+
         parentView.addView(emojiRootView, params);
         addedViews.add(emojiRootView);
         if (onPhotoEditorSDKListener != null)
             onPhotoEditorSDKListener.onAddViewListener(ViewType.EMOJI, addedViews.size());
+
     }
+
 
     public void setBrushDrawingMode(boolean brushDrawingMode) {
         if (brushDrawingView != null)
@@ -217,6 +210,27 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
     private boolean isSDCARDMounted() {
         String status = Environment.getExternalStorageState();
         return status.equals(Environment.MEDIA_MOUNTED);
+    }
+
+    private void loadImage(@NonNull Uri uri, @NonNull ImageView imageView, int size) {
+        Glide.with(context)
+                .load(uri)
+                .apply(new RequestOptions()
+                        .dontAnimate()
+                        .skipMemoryCache(false)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .override(size, size))
+                .into(imageView);
+    }
+
+    private void loadImage(@NonNull String url, @NonNull ImageView imageView, int size) {
+        Glide.with(context)
+                .load(url)
+                .apply(new RequestOptions().dontAnimate()
+                        .skipMemoryCache(false)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .override(size, size))
+                .into(imageView);
     }
 
     private String convertEmoji(String emoji) {

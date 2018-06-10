@@ -2,8 +2,6 @@ package hadyelmahrangy.com.photoapp.imageEditor;
 
 import android.content.Intent;
 import android.content.res.AssetManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -16,8 +14,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import com.ahmedadeltito.photoeditorsdk.PhotoEditorSDK;
-
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -29,6 +25,7 @@ import hadyelmahrangy.com.photoapp.imageEditor.adapters.emoji.EmojisAdapter;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.ImageFilterClickListener;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.ImageFiltersAdapter;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.hajib.HajibAdapter;
+import hadyelmahrangy.com.photoapp.imageEditor.sdk.PhotoEditorSDK;
 import hadyelmahrangy.com.photoapp.result.ResultActivity;
 import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
 
@@ -90,16 +87,7 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
     protected void onViewReady() {
         getPhoto();
         getScreenSize();
-
-        photoEditorSDK = new PhotoEditorSDK.PhotoEditorSDKBuilder(ImageEditorActivity.this)
-                .parentView(rlPhotoParent)
-//add parent image view
-                .childView(ivPhotoEdit)
-//add the desired image view
-                .deleteView(ivDeleteViewFromPhoto)
-// add the brush drawing view that is responsible for drawing on the image view
-                .buildPhotoEditorSDK();
-// build photo editor sdk
+        initSDK();
     }
 
     @Override
@@ -144,7 +132,7 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
         switch (tab) {
             case TAB_EMOJI:
                 if (recViewEmojis.getVisibility() == View.GONE) {
-                    setLayoutsVisibility(View.VISIBLE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
+                    setLayoutsVisibility(View.VISIBLE, View.GONE, View.GONE, View.VISIBLE, View.GONE);
                     initEmojisAdapter();
                 } else {
                     setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
@@ -152,7 +140,7 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
                 break;
             case TAB_HAJIB:
                 if (recViewHajib.getVisibility() == View.GONE) {
-                    setLayoutsVisibility(View.GONE, View.VISIBLE, View.GONE, View.VISIBLE, View.VISIBLE);
+                    setLayoutsVisibility(View.GONE, View.VISIBLE, View.GONE, View.VISIBLE, View.GONE);
                     initHajibAdapter();
                 } else {
                     setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
@@ -224,15 +212,13 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
     @Override
     public void onEmojisClick(@NonNull String unicode) {
         setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
-
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_camera);
-        photoEditorSDK.addImage( bitmap);
+        photoEditorSDK.addEmoji(unicode);
     }
 
     @Override
     public void onClick(@NonNull String borderName) {
         setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
-        //TODO
+        photoEditorSDK.addImage(borderName);
     }
 
     @Override
@@ -250,6 +236,15 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
             e.printStackTrace();
         }
         return files;
+    }
+
+    //SDK
+    private void initSDK() {
+        photoEditorSDK = new PhotoEditorSDK.PhotoEditorSDKBuilder(ImageEditorActivity.this)
+                .parentView(rlPhotoParent)
+                .childView(ivPhotoEdit)
+                .deleteView(ivDeleteViewFromPhoto)
+                .buildPhotoEditorSDK();
     }
 
 }

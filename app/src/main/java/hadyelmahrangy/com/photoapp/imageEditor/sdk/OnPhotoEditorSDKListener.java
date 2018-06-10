@@ -1,8 +1,4 @@
-package com.ahmedadeltito.photoeditorsdk;
-
-/**
- * Created by Ahmed Adel on 02/06/2017.
- */
+package hadyelmahrangy.com.photoapp.imageEditor.sdk;
 
 public interface OnPhotoEditorSDKListener {
 

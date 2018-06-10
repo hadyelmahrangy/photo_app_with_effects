@@ -1,4 +1,4 @@
-package com.ahmedadeltito.photoeditorsdk;
+package hadyelmahrangy.com.photoapp.imageEditor.sdk;
 
 import android.graphics.Rect;
 import android.view.MotionEvent;

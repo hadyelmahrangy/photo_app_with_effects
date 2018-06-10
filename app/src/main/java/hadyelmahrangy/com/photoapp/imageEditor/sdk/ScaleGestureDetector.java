@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ahmedadeltito.photoeditorsdk;
+package hadyelmahrangy.com.photoapp.imageEditor.sdk;
 
 import android.util.Log;
 import android.view.MotionEvent;

@@ -1,4 +1,4 @@
-package com.ahmedadeltito.photoeditorsdk;
+package hadyelmahrangy.com.photoapp.imageEditor.sdk;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -13,10 +13,6 @@ import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-
-/**
- * Created by Ahmed Adel on 5/8/17.
- */
 
 public class BrushDrawingView extends View {
 
