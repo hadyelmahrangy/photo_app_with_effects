@@ -2,6 +2,8 @@ package hadyelmahrangy.com.photoapp.imageEditor;
 
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -12,6 +14,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Display;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+
+import com.ahmedadeltito.photoeditorsdk.PhotoEditorSDK;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -53,6 +58,12 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
     @BindView(R.id.photo_edit_iv)
     ImageView ivPhotoEdit;
 
+    @BindView(R.id.parent_image_rl)
+    RelativeLayout rlPhotoParent;
+
+    @BindView(R.id.trash_iv)
+    ImageView ivDeleteViewFromPhoto;
+
     @BindView(R.id.iv_next_screen)
     ImageView ivNextScreen;
 
@@ -73,10 +84,22 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
     int width;
     int height;
 
+    private PhotoEditorSDK photoEditorSDK;
+
     @Override
     protected void onViewReady() {
         getPhoto();
         getScreenSize();
+
+        photoEditorSDK = new PhotoEditorSDK.PhotoEditorSDKBuilder(ImageEditorActivity.this)
+                .parentView(rlPhotoParent)
+//add parent image view
+                .childView(ivPhotoEdit)
+//add the desired image view
+                .deleteView(ivDeleteViewFromPhoto)
+// add the brush drawing view that is responsible for drawing on the image view
+                .buildPhotoEditorSDK();
+// build photo editor sdk
     }
 
     @Override
@@ -201,7 +224,9 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
     @Override
     public void onEmojisClick(@NonNull String unicode) {
         setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
-        //TODO
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_camera);
+        photoEditorSDK.addImage( bitmap);
     }
 
     @Override
@@ -226,4 +251,5 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
         }
         return files;
     }
+
 }
