@@ -44,4 +44,6 @@
     <string name="miss_etikate">Miss Etikate</string>
     <string name="soft_elegance">Soft Elegance</string>
     <string name="gotham">Gotham</string>
+    <string name="message_about_update">We are still working on 3D filters to provide a service that suits your privilege. Please enjoy resizing your hijab at the moment until next update. Thank you.</string>
+    <string name="do_not_show_msg">Do not show this message again.</string>
 </resources>
