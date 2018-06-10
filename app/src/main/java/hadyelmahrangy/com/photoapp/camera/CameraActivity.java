@@ -1,8 +1,10 @@
 package hadyelmahrangy.com.photoapp.camera;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
@@ -11,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 
@@ -30,9 +33,9 @@ import hadyelmahrangy.com.photoapp.BaseActivity;
 import hadyelmahrangy.com.photoapp.R;
 import hadyelmahrangy.com.photoapp.gallery.GalleryActivity;
 import hadyelmahrangy.com.photoapp.imageEditor.ImageEditorActivity;
-import hadyelmahrangy.com.photoapp.result.ResultActivity;
 import hadyelmahrangy.com.photoapp.util.CapturePhotoUtils;
 import hadyelmahrangy.com.photoapp.util.PermissionManager;
+import hadyelmahrangy.com.photoapp.util.SharedPrefUtils;
 
 public class CameraActivity extends BaseActivity {
 
@@ -74,6 +77,15 @@ public class CameraActivity extends BaseActivity {
         scaleGestureDetector = new ScaleGestureDetector(this, mCameraScaleListener);
         if (hasCameraPermission()) {
             createCamera();
+        }
+        showHintDialog();
+    }
+
+    private void showHintDialog() {
+        if (SharedPrefUtils.isShowAgain(this)) {
+            MessageDialog cdd = new MessageDialog(CameraActivity.this);
+            cdd.show();
+            cdd.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
     }
 
