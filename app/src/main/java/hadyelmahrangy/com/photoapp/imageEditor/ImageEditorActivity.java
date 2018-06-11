@@ -163,7 +163,7 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
     @OnClick(R.id.iv_next_screen)
     void onNextClick() {
         if (photoEditorSDK != null) {
-            showProgressDialog(R.string.saving);
+            showProgressDialog(R.string.processing);
             photoEditorSDK.saveImage(this, new CapturePhotoUtils.SavePhotoToFileCallback() {
                 @Override
                 public void onSaveSuccess(Uri uri) {
