@@ -86,7 +86,7 @@
                 android:layout_gravity="center"
                 android:foreground="?android:attr/selectableItemBackgroundBorderless"
                 android:padding="10dp"
-                android:src="@mipmap/btn_library" />
+                android:src="@drawable/ic_add" />
 
         </FrameLayout>
 
