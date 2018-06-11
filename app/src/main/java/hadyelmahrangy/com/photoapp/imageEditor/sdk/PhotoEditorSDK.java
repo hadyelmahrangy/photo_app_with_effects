@@ -47,18 +47,18 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
 
     //filters
     //filters
-    Bitmap originalImage;
+    private Bitmap originalImage;
     // to backup image with filter applied
-    Bitmap filteredImage;
+    private Bitmap filteredImage;
 
     // the final image after applying
     // brightness, saturation, contrast
-    Bitmap finalImage;
+    private Bitmap finalImage;
 
     // modified image values
-    int brightnessFinal = 0;
-    float saturationFinal = 1.0f;
-    float contrastFinal = 1.0f;
+    private int brightnessFinal = 0;
+    private float saturationFinal = 1.0f;
+    private float contrastFinal = 1.0f;
 
     private PhotoEditorSDK(PhotoEditorSDKBuilder photoEditorSDKBuilder) {
         this.context = photoEditorSDKBuilder.context;

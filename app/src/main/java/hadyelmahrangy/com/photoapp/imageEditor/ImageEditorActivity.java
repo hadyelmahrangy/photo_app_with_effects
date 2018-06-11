@@ -97,6 +97,9 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
     @BindView(R.id.iv_next_screen)
     ImageView ivNextScreen;
 
+    @BindView(R.id.iv_back)
+    ImageView ivBack;
+
     @BindView(R.id.rec_view_emojis)
     RecyclerView recViewEmojis;
 
@@ -166,6 +169,11 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
         showSaveImageDialog();
     }
 
+    @OnClick(R.id.iv_back)
+    void onBackClick() {
+        onBackPressed();
+    }
+
     @OnClick(R.id.iv_emojis)
     void onEmojisClick() {
         selectTab(TAB_EMOJI);
@@ -183,30 +191,30 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
 
     @OnClick(R.id.tv_close_filters)
     void closeFilters() {
-        setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
+        setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE, View.VISIBLE);
     }
 
     private void selectTab(int tab) {
         switch (tab) {
             case TAB_EMOJI:
                 if (recViewEmojis.getVisibility() == View.GONE) {
-                    setLayoutsVisibility(View.VISIBLE, View.GONE, View.GONE, View.VISIBLE, View.GONE);
+                    setLayoutsVisibility(View.VISIBLE, View.GONE, View.GONE, View.VISIBLE, View.GONE, View.GONE);
                     initEmojisAdapter();
                 } else {
-                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
+                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE, View.VISIBLE);
                 }
                 break;
             case TAB_HAJIB:
                 if (recViewHajib.getVisibility() == View.GONE) {
-                    setLayoutsVisibility(View.GONE, View.VISIBLE, View.GONE, View.VISIBLE, View.GONE);
+                    setLayoutsVisibility(View.GONE, View.VISIBLE, View.GONE, View.VISIBLE, View.GONE, View.GONE);
                     initHajibAdapter();
                 } else {
-                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
+                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE, View.VISIBLE);
                 }
                 break;
             case TAB_FITERS:
                 if (filtersContainer.getVisibility() == View.GONE) {
-                    setLayoutsVisibility(View.GONE, View.GONE, View.VISIBLE, View.GONE, View.GONE);
+                    setLayoutsVisibility(View.GONE, View.GONE, View.VISIBLE, View.GONE, View.GONE, View.GONE);
                     initFiltersAdapter();
                     resetControls();
                     if (filtersListFragment != null) {
@@ -216,7 +224,7 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
                         Objects.requireNonNull(tbFilters.getTabAt(0)).select();
                     }
                 } else {
-                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
+                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE, View.VISIBLE);
                 }
         }
     }
@@ -225,18 +233,22 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
                                       int tabHajibVisibility,
                                       int tabFiltersVisibility,
                                       int bottomContainerVisibility,
-                                      int nextBtnVisibility) {
+                                      int nextBtnVisibility,
+                                      int backBtnVisibility) {
         recViewEmojis.setVisibility(tabEmojiVisibility);
         recViewHajib.setVisibility(tabHajibVisibility);
         filtersContainer.setVisibility(tabFiltersVisibility);
         bottomContainer.setVisibility(bottomContainerVisibility);
         ivNextScreen.setVisibility(nextBtnVisibility);
+        ivBack.setVisibility(backBtnVisibility);
     }
 
     private void setLayoutsVisibility(int bottomContainerVisibility,
-                                      int nextBtnVisibility) {
+                                      int nextBtnVisibility,
+                                      int backBtnVisibility) {
         bottomContainer.setVisibility(bottomContainerVisibility);
         ivNextScreen.setVisibility(nextBtnVisibility);
+        ivBack.setVisibility(backBtnVisibility);
     }
 
     private void getPhoto() {
@@ -274,13 +286,13 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
 
     @Override
     public void onEmojisClick(@NonNull String unicode) {
-        setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
+        setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE, View.VISIBLE);
         photoEditorSDK.addEmoji(unicode);
     }
 
     @Override
     public void onClick(@NonNull String borderName) {
-        setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
+        setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE, View.VISIBLE);
         photoEditorSDK.addImage(borderName);
     }
 
@@ -324,13 +336,13 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
 
     @Override
     public void onStartViewChangeListener(ViewType viewType) {
-        setLayoutsVisibility(View.GONE, View.GONE);
+        setLayoutsVisibility(View.GONE, View.GONE, View.GONE);
 
     }
 
     @Override
     public void onStopViewChangeListener(ViewType viewType) {
-        setLayoutsVisibility(View.VISIBLE, View.VISIBLE);
+        setLayoutsVisibility(View.VISIBLE, View.VISIBLE, View.VISIBLE);
 
     }
 
