@@ -165,13 +165,18 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
 
     @Override
     public void onBackPressed() {
-        //TODO close containers first
-        showSaveImageDialog();
+        if (recViewEmojis.getVisibility() == View.GONE
+                && recViewHajib.getVisibility() == View.GONE
+                && filtersContainer.getVisibility() == View.GONE) {
+            showSaveImageDialog();
+        } else {
+            setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE, View.VISIBLE);
+        }
     }
 
     @OnClick(R.id.iv_back)
     void onBackClick() {
-        onBackPressed();
+        showSaveImageDialog();
     }
 
     @OnClick(R.id.iv_emojis)
@@ -462,7 +467,7 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
     private void showSaveImageDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(ImageEditorActivity.this);
         builder.setMessage(R.string.save_image_question)
-                .setCancelable(false)
+                .setCancelable(true)
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
