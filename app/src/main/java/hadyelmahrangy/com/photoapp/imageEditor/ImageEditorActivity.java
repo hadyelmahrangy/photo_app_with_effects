@@ -11,6 +11,7 @@ import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -24,6 +25,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.squareup.otto.Subscribe;
 import com.zomato.photofilters.imageprocessors.Filter;
 
 import java.io.IOException;
@@ -34,6 +41,8 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import hadyelmahrangy.com.photoapp.BaseActivity;
 import hadyelmahrangy.com.photoapp.R;
+import hadyelmahrangy.com.photoapp.eventBus.AppBus;
+import hadyelmahrangy.com.photoapp.eventBus.PhotoFromGalleryEvent;
 import hadyelmahrangy.com.photoapp.adv.BaseAdvActivity;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.emoji.EmojisAdapter;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.EditImageFragment;
@@ -97,6 +106,9 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
     @BindView(R.id.iv_next_screen)
     ImageView ivNextScreen;
 
+    @BindView(R.id.iv_back)
+    ImageView ivBack;
+
     @BindView(R.id.rec_view_emojis)
     RecyclerView recViewEmojis;
 
@@ -121,16 +133,21 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
 
     @Override
     protected void onViewReady() {
-        super.onViewReady();
-        getPhoto();
+        AppBus.getBus().register(this);
+        init();
         getScreenSize();
-        initSDK();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         hideStatusBar();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        AppBus.getBus().unregister(this);
     }
 
     @Override
@@ -163,7 +180,17 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
 
     @Override
     public void onBackPressed() {
-        //TODO close containers first
+        if (recViewEmojis.getVisibility() == View.GONE
+                && recViewHajib.getVisibility() == View.GONE
+                && filtersContainer.getVisibility() == View.GONE) {
+            showSaveImageDialog();
+        } else {
+            setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE, View.VISIBLE);
+        }
+    }
+
+    @OnClick(R.id.iv_back)
+    void onBackClick() {
         showSaveImageDialog();
     }
 
@@ -184,30 +211,35 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
 
     @OnClick(R.id.tv_close_filters)
     void closeFilters() {
-        setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
+        setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE, View.VISIBLE);
+    }
+
+    @Subscribe
+    public void onReceiveImage(@NonNull PhotoFromGalleryEvent photo) {
+        init(photo.getImage());
     }
 
     private void selectTab(int tab) {
         switch (tab) {
             case TAB_EMOJI:
                 if (recViewEmojis.getVisibility() == View.GONE) {
-                    setLayoutsVisibility(View.VISIBLE, View.GONE, View.GONE, View.VISIBLE, View.GONE);
+                    setLayoutsVisibility(View.VISIBLE, View.GONE, View.GONE, View.VISIBLE, View.GONE, View.GONE);
                     initEmojisAdapter();
                 } else {
-                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
+                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE, View.VISIBLE);
                 }
                 break;
             case TAB_HAJIB:
                 if (recViewHajib.getVisibility() == View.GONE) {
-                    setLayoutsVisibility(View.GONE, View.VISIBLE, View.GONE, View.VISIBLE, View.GONE);
+                    setLayoutsVisibility(View.GONE, View.VISIBLE, View.GONE, View.VISIBLE, View.GONE, View.GONE);
                     initHajibAdapter();
                 } else {
-                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
+                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE, View.VISIBLE);
                 }
                 break;
             case TAB_FITERS:
                 if (filtersContainer.getVisibility() == View.GONE) {
-                    setLayoutsVisibility(View.GONE, View.GONE, View.VISIBLE, View.GONE, View.GONE);
+                    setLayoutsVisibility(View.GONE, View.GONE, View.VISIBLE, View.GONE, View.GONE, View.GONE);
                     initFiltersAdapter();
                     resetControls();
                     if (filtersListFragment != null) {
@@ -217,7 +249,7 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
                         Objects.requireNonNull(tbFilters.getTabAt(0)).select();
                     }
                 } else {
-                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
+                    setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE, View.VISIBLE);
                 }
         }
     }
@@ -226,23 +258,66 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
                                       int tabHajibVisibility,
                                       int tabFiltersVisibility,
                                       int bottomContainerVisibility,
-                                      int nextBtnVisibility) {
+                                      int nextBtnVisibility,
+                                      int backBtnVisibility) {
         recViewEmojis.setVisibility(tabEmojiVisibility);
         recViewHajib.setVisibility(tabHajibVisibility);
         filtersContainer.setVisibility(tabFiltersVisibility);
         bottomContainer.setVisibility(bottomContainerVisibility);
         ivNextScreen.setVisibility(nextBtnVisibility);
+        ivBack.setVisibility(backBtnVisibility);
     }
 
     private void setLayoutsVisibility(int bottomContainerVisibility,
-                                      int nextBtnVisibility) {
+                                      int nextBtnVisibility,
+                                      int backBtnVisibility) {
         bottomContainer.setVisibility(bottomContainerVisibility);
         ivNextScreen.setVisibility(nextBtnVisibility);
+        ivBack.setVisibility(backBtnVisibility);
     }
 
-    private void getPhoto() {
+    private void init() {
         photoUri = getIntent().getParcelableExtra(KEY_IMAGE_URI);
-        ivPhotoEdit.setImageURI(photoUri);
+        Glide.with(this)
+                .asBitmap()
+                .load(photoUri)
+                .apply(new RequestOptions()
+                        .placeholder(R.color.black)
+                        .dontTransform()
+                        .diskCacheStrategy(DiskCacheStrategy.NONE))
+                .into(new BitmapImageViewTarget(ivPhotoEdit) {
+                    @Override
+                    public void onResourceReady(Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        if (!ImageEditorActivity.this.isFinishing() && resource != null) {
+                            ivPhotoEdit.setImageBitmap(resource);
+                            initSDK();
+                        }
+                    }
+                });
+    }
+
+    private void init(@NonNull Uri uri) {
+        photoUri = uri;
+        ivPhotoEdit.setImageURI(uri);
+        clearSDK();
+        initSDK();
+//        Glide.with(this)
+//                .asBitmap()
+//                .load(photoUri)
+//                .apply(new RequestOptions()
+//                        .placeholder(R.color.black)
+//                        .dontTransform()
+//                        .diskCacheStrategy(DiskCacheStrategy.NONE))
+//                .into(new BitmapImageViewTarget(ivPhotoEdit) {
+//                    @Override
+//                    public void onResourceReady(Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+//                        if (!ImageEditorActivity.this.isFinishing() && resource != null) {
+//                            ivPhotoEdit.setImageBitmap(resource);
+//                            clearSDK();
+//                            initSDK();
+//                        }
+//                    }
+//                });
     }
 
     private void getScreenSize() {
@@ -275,13 +350,13 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
 
     @Override
     public void onEmojisClick(@NonNull String unicode) {
-        setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
+        setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE, View.VISIBLE);
         photoEditorSDK.addEmoji(unicode);
     }
 
     @Override
     public void onClick(@NonNull String borderName) {
-        setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE);
+        setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE, View.VISIBLE);
         photoEditorSDK.addImage(borderName);
     }
 
@@ -308,6 +383,10 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
         photoEditorSDK.initFilters();
     }
 
+    private void clearSDK() {
+        photoEditorSDK = null;
+    }
+
     @Override
     public void onEditTextChangeListener(String text, int colorCode) {
         //no-op
@@ -325,13 +404,13 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
 
     @Override
     public void onStartViewChangeListener(ViewType viewType) {
-        setLayoutsVisibility(View.GONE, View.GONE);
+        setLayoutsVisibility(View.GONE, View.GONE, View.GONE);
 
     }
 
     @Override
     public void onStopViewChangeListener(ViewType viewType) {
-        setLayoutsVisibility(View.VISIBLE, View.VISIBLE);
+        setLayoutsVisibility(View.VISIBLE, View.VISIBLE, View.VISIBLE);
 
     }
 
@@ -430,7 +509,7 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
     private void showSaveImageDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(ImageEditorActivity.this);
         builder.setMessage(R.string.save_image_question)
-                .setCancelable(false)
+                .setCancelable(true)
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
