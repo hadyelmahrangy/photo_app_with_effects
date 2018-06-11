@@ -56,7 +56,7 @@
             android:theme="@style/AppTheme" />
 
         <activity
-            android:name=".adv.AdvActivity"
+            android:name=".adv.BaseAdvActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
 

@@ -14,6 +14,9 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -34,6 +37,9 @@ public class GalleryActivity extends AppCompatActivity {
     @BindView(R.id.empty_placeholder)
     View emptyPlaceholder;
 
+    @BindView(R.id.adView)
+    AdView adViewBanner;
+
     private GalleryAdapter adapter;
 
     @Override
@@ -41,6 +47,7 @@ public class GalleryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
         ButterKnife.bind(this);
+        loadAddBanner();
         initAdapter();
 
         if (hasStoragePermission()) {
@@ -103,6 +110,11 @@ public class GalleryActivity extends AppCompatActivity {
         }
         Collections.reverse(listOfAllImages);
         return listOfAllImages;
+    }
+
+    private void loadAddBanner() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adViewBanner.loadAd(adRequest);
     }
 
     private boolean hasStoragePermission() {

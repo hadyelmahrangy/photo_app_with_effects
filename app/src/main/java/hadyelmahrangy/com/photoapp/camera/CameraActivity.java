@@ -26,6 +26,7 @@ import com.google.android.gms.vision.face.FaceDetector;
 import com.google.android.gms.vision.face.LargestFaceFocusingProcessor;
 
 import java.io.IOException;
+import java.security.Policy;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -83,9 +84,13 @@ public class CameraActivity extends BaseActivity {
 
     private void showHintDialog() {
         if (SharedPrefUtils.isShowAgain(this)) {
-            MessageDialog cdd = new MessageDialog(CameraActivity.this);
-            cdd.show();
-            cdd.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            MessageDialog hintDialog = new MessageDialog(CameraActivity.this);
+            hintDialog.show();
+            if (hintDialog.getWindow() != null) {
+                hintDialog
+                        .getWindow()
+                        .setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
         }
     }
 

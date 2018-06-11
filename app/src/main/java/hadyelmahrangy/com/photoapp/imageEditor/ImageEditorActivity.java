@@ -34,7 +34,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import hadyelmahrangy.com.photoapp.BaseActivity;
 import hadyelmahrangy.com.photoapp.R;
-import hadyelmahrangy.com.photoapp.adv.AdvActivity;
+import hadyelmahrangy.com.photoapp.adv.BaseAdvActivity;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.emoji.EmojisAdapter;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.EditImageFragment;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.FiltersListFragment;
@@ -47,7 +47,7 @@ import hadyelmahrangy.com.photoapp.result.ResultActivity;
 import hadyelmahrangy.com.photoapp.util.CapturePhotoUtils;
 import hadyelmahrangy.com.photoapp.util.PermissionManager;
 
-public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.EmojisAdapterListener,
+public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapter.EmojisAdapterListener,
         HajibAdapter.BordersAdapterListener,
         FiltersListFragment.FiltersListFragmentListener,
         EditImageFragment.EditImageFragmentListener,
@@ -121,6 +121,7 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
 
     @Override
     protected void onViewReady() {
+        super.onViewReady();
         getPhoto();
         getScreenSize();
         initSDK();
@@ -424,28 +425,7 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
         }
     }
 
-    private void showPhotoSavedDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(ImageEditorActivity.this);
-        builder.setTitle(R.string.photo_saved)
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        AdvActivity.launch(ImageEditorActivity.this);
-                        finish();
-                    }
-                })
-                .setCancelable(false);
 
-        final AlertDialog alertDialog = builder.create();
-        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialog) {
-                Button btnPositive = alertDialog.getButton(Dialog.BUTTON_POSITIVE);
-                btnPositive.setTextSize(18);
-            }
-        });
-        alertDialog.show();
-    }
 
     private void showSaveImageDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(ImageEditorActivity.this);
