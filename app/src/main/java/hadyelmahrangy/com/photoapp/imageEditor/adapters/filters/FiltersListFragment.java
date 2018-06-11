@@ -18,6 +18,7 @@ import com.zomato.photofilters.utils.ThumbnailsManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -67,7 +68,7 @@ public class FiltersListFragment extends Fragment implements ThumbnailsAdapter.T
         recyclerView.addItemDecoration(new SpacesItemDecoration(space));
         recyclerView.setAdapter(mAdapter);
 
-        Bitmap image = ((ImageEditorActivity) getActivity()).getOriginalImage();
+        Bitmap image = ((ImageEditorActivity) Objects.requireNonNull(getActivity())).getOriginalImage();
         prepareThumbnail(image);
 
         return view;
