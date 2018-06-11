@@ -30,6 +30,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.google.android.gms.ads.AdListener;
 import com.squareup.otto.Subscribe;
 import com.zomato.photofilters.imageprocessors.Filter;
 
@@ -133,6 +134,7 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
 
     @Override
     protected void onViewReady() {
+        super.onViewReady();
         AppBus.getBus().register(this);
         init();
         getScreenSize();
@@ -466,7 +468,6 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
         if (photoEditorSDK != null) {
             photoEditorSDK.onBrightnessChanged(brightness);
         }
-
     }
 
     @Override
@@ -503,7 +504,6 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
             return ((BitmapDrawable) ivPhotoEdit.getDrawable()).getBitmap();
         }
     }
-
 
 
     private void showSaveImageDialog() {

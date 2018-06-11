@@ -48,7 +48,7 @@ dependencies {
     implementation 'com.karumi:dexter:4.1.0'
 
     //Otto event bus
-    compile 'com.squareup:otto:1.3.8'
+    implementation 'com.squareup:otto:1.3.8'
 
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'

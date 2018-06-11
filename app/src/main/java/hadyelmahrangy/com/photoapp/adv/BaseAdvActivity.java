@@ -11,6 +11,7 @@ import com.google.android.gms.ads.InterstitialAd;
 
 import hadyelmahrangy.com.photoapp.BaseActivity;
 import hadyelmahrangy.com.photoapp.R;
+import hadyelmahrangy.com.photoapp.imageEditor.ImageEditorActivity;
 
 public abstract class BaseAdvActivity extends BaseActivity {
 
@@ -20,6 +21,8 @@ public abstract class BaseAdvActivity extends BaseActivity {
 
     private boolean isShown;
 
+    private boolean needToShow;
+
     @Override
     protected void onViewReady() {
         mInterstitialAd = new InterstitialAd(this);
@@ -28,31 +31,30 @@ public abstract class BaseAdvActivity extends BaseActivity {
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
-                if (!isShown) {
+                if (!isShown && needToShow) {
                     mInterstitialAd.show();
+                    needToShow = false;
                 }
             }
 
             @Override
             public void onAdFailedToLoad(int errorCode) {
-                isShown = false;
-                finish();
+                if (needToShow)
+                    finish();
             }
 
             @Override
             public void onAdOpened() {
                 isShown = true;
+                needToShow = false;
             }
 
             @Override
             public void onAdLeftApplication() {
-                isShown = false;
-                finish();
             }
 
             @Override
             public void onAdClosed() {
-                isShown = false;
                 finish();
             }
         });
@@ -81,8 +83,11 @@ public abstract class BaseAdvActivity extends BaseActivity {
     }
 
     private void openAds() {
+        needToShow = true;
         if (mInterstitialAd.isLoaded()) {
             mInterstitialAd.show();
+        } else if (this instanceof ImageEditorActivity) {
+            finish();
         }
     }
 }
