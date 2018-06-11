@@ -11,6 +11,7 @@ import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -24,6 +25,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.squareup.otto.Subscribe;
 import com.zomato.photofilters.imageprocessors.Filter;
 
@@ -128,9 +134,8 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
     @Override
     protected void onViewReady() {
         AppBus.getBus().register(this);
-        getPhoto();
+        init();
         getScreenSize();
-        initSDK();
     }
 
     @Override
@@ -211,9 +216,7 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
 
     @Subscribe
     public void onReceiveImage(@NonNull PhotoFromGalleryEvent photo) {
-        getPhoto(photo.getImage());
-        clearSDK();
-        initSDK();
+        init(photo.getImage());
     }
 
     private void selectTab(int tab) {
@@ -273,14 +276,48 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
         ivBack.setVisibility(backBtnVisibility);
     }
 
-    private void getPhoto() {
+    private void init() {
         photoUri = getIntent().getParcelableExtra(KEY_IMAGE_URI);
-        ivPhotoEdit.setImageURI(photoUri);
+        Glide.with(this)
+                .asBitmap()
+                .load(photoUri)
+                .apply(new RequestOptions()
+                        .placeholder(R.color.black)
+                        .dontTransform()
+                        .diskCacheStrategy(DiskCacheStrategy.NONE))
+                .into(new BitmapImageViewTarget(ivPhotoEdit) {
+                    @Override
+                    public void onResourceReady(Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        if (!ImageEditorActivity.this.isFinishing() && resource != null) {
+                            ivPhotoEdit.setImageBitmap(resource);
+                            initSDK();
+                        }
+                    }
+                });
     }
 
-    private void getPhoto(@NonNull Uri uri) {
+    private void init(@NonNull Uri uri) {
         photoUri = uri;
-        ivPhotoEdit.setImageURI(photoUri);
+        ivPhotoEdit.setImageURI(uri);
+        clearSDK();
+        initSDK();
+//        Glide.with(this)
+//                .asBitmap()
+//                .load(photoUri)
+//                .apply(new RequestOptions()
+//                        .placeholder(R.color.black)
+//                        .dontTransform()
+//                        .diskCacheStrategy(DiskCacheStrategy.NONE))
+//                .into(new BitmapImageViewTarget(ivPhotoEdit) {
+//                    @Override
+//                    public void onResourceReady(Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+//                        if (!ImageEditorActivity.this.isFinishing() && resource != null) {
+//                            ivPhotoEdit.setImageBitmap(resource);
+//                            clearSDK();
+//                            initSDK();
+//                        }
+//                    }
+//                });
     }
 
     private void getScreenSize() {
