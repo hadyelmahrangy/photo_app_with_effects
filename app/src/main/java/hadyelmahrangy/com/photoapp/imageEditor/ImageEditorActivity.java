@@ -1,6 +1,10 @@
 package hadyelmahrangy.com.photoapp.imageEditor;
 
+import android.Manifest;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Point;
@@ -9,12 +13,14 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Display;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -28,6 +34,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import hadyelmahrangy.com.photoapp.BaseActivity;
 import hadyelmahrangy.com.photoapp.R;
+import hadyelmahrangy.com.photoapp.adv.AdvActivity;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.emoji.EmojisAdapter;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.EditImageFragment;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.FiltersListFragment;
@@ -37,12 +44,19 @@ import hadyelmahrangy.com.photoapp.imageEditor.sdk.OnPhotoEditorSDKListener;
 import hadyelmahrangy.com.photoapp.imageEditor.sdk.PhotoEditorSDK;
 import hadyelmahrangy.com.photoapp.imageEditor.sdk.ViewType;
 import hadyelmahrangy.com.photoapp.result.ResultActivity;
+import hadyelmahrangy.com.photoapp.util.CapturePhotoUtils;
+import hadyelmahrangy.com.photoapp.util.PermissionManager;
 
 public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.EmojisAdapterListener,
         HajibAdapter.BordersAdapterListener,
         FiltersListFragment.FiltersListFragmentListener,
         EditImageFragment.EditImageFragmentListener,
         OnPhotoEditorSDKListener {
+
+    private static final int RC_SAVE_IMAGE = 106;
+
+    private static final String PERMISSION_STORAGE_WRITE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+    private static final String PERMISSION_STORAGE_READ = Manifest.permission.READ_EXTERNAL_STORAGE;
 
     // load native image filters library
     static {
@@ -125,9 +139,31 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
 
     @OnClick(R.id.iv_next_screen)
     void onNextClick() {
-        //TODO SAVE CHANGES
-        ResultActivity.launch(this, photoUri);
-        finish();
+        if (photoEditorSDK != null) {
+            showProgressDialog(R.string.saving);
+            photoEditorSDK.saveImage(this, new CapturePhotoUtils.SavePhotoToFileCallback() {
+                @Override
+                public void onSaveSuccess(Uri uri) {
+                    hideProgressDialog();
+                    ResultActivity.launch(ImageEditorActivity.this, uri);
+                }
+
+                @Override
+                public void onSaveFail(String error) {
+                    hideProgressDialog();
+                    showMessage(error);
+                }
+            });
+        } else {
+            showMessage("Fail to save photo");
+            finish();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        //TODO close containers first
+        showSaveImageDialog();
     }
 
     @OnClick(R.id.iv_emojis)
@@ -369,7 +405,7 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
 
     @Override
     public void onEditStarted() {
-       //no-op
+        //no-op
     }
 
     @Override
@@ -386,5 +422,106 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
         } else {
             return ((BitmapDrawable) ivPhotoEdit.getDrawable()).getBitmap();
         }
+    }
+
+    private void showPhotoSavedDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ImageEditorActivity.this);
+        builder.setTitle(R.string.photo_saved)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        AdvActivity.launch(ImageEditorActivity.this);
+                        finish();
+                    }
+                })
+                .setCancelable(false);
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                Button btnPositive = alertDialog.getButton(Dialog.BUTTON_POSITIVE);
+                btnPositive.setTextSize(18);
+            }
+        });
+        alertDialog.show();
+    }
+
+    private void showSaveImageDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ImageEditorActivity.this);
+        builder.setMessage(R.string.save_image_question)
+                .setCancelable(false)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (!hasStorageWritePermission(RC_SAVE_IMAGE)) return;
+                        if (!hasStorageReadPermission(RC_SAVE_IMAGE)) return;
+
+                        showProgressDialog(R.string.saving);
+                        Bitmap image = loadBitmapFromView(rlPhotoParent);
+                        CapturePhotoUtils.saveImageToGallery(ImageEditorActivity.this, image, getResources().getString(R.string.folder_name), new CapturePhotoUtils.SavePhotoToGalleryCallback() {
+                            @Override
+                            public void onLoadSuccess(String path, Uri uri) {
+                                hideProgressDialog();
+                                showPhotoSavedDialog();
+                            }
+
+                            @Override
+                            public void onLoadFail(String error) {
+                                hideProgressDialog();
+                                showMessage(R.string.saving_fail);
+                            }
+                        });
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    //permissions
+    private boolean hasStorageWritePermission(int requestCode) {
+        return PermissionManager.hasPermission(this, PERMISSION_STORAGE_WRITE, requestCode);
+    }
+
+    private boolean hasStorageReadPermission(int requestCode) {
+        return PermissionManager.hasPermission(this, PERMISSION_STORAGE_READ, requestCode);
+    }
+
+    private boolean isPermissionNeverAsk(String permission) {
+        return PermissionManager.isNeverAsk(this, permission);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults.length > 0 && permissions.length > 0) {
+            int result = grantResults[0];
+            String permission = permissions[0];
+
+            switch (requestCode) {
+                case RC_SAVE_IMAGE:
+                    if (result == PackageManager.PERMISSION_GRANTED) {
+                        showSaveImageDialog();
+                    } else {
+                        if (isPermissionNeverAsk(permission)) {
+                            PermissionManager.showPermissionNeverAskDialog(ImageEditorActivity.this, getPermissionName(permission));
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+
+    @NonNull
+    private String getPermissionName(String permission) {
+        if (permission.equals(PERMISSION_STORAGE_READ)) return "Storage read";
+        if (permission.equals(PERMISSION_STORAGE_WRITE)) return "Storage write";
+        return "Storage";
     }
 }

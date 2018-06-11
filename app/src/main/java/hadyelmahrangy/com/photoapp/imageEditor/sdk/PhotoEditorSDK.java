@@ -1,5 +1,6 @@
 package hadyelmahrangy.com.photoapp.imageEditor.sdk;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -32,6 +33,7 @@ import java.util.List;
 
 import hadyelmahrangy.com.photoapp.R;
 import hadyelmahrangy.com.photoapp.imageEditor.ImageEditorActivity;
+import hadyelmahrangy.com.photoapp.util.CapturePhotoUtils;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconTextView;
 
 public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
@@ -207,6 +209,16 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
         myFilter.addSubFilter(new ContrastSubFilter(contrastFinal));
         myFilter.addSubFilter(new SaturationSubfilter(saturationFinal));
         finalImage = myFilter.processFilter(bitmap);
+    }
+
+    public void saveImage(Activity activity, @NonNull CapturePhotoUtils.SavePhotoToFileCallback callback) {
+        parentView.setDrawingCacheEnabled(true);
+        parentView.buildDrawingCache();
+        Bitmap image = parentView.getDrawingCache(true).copy(Bitmap.Config.RGB_565, false);
+        parentView.setDrawingCacheEnabled(false);
+        parentView.destroyDrawingCache();
+
+        CapturePhotoUtils.savePhotoToFile(activity, image, callback);
     }
 
     public Bitmap getOriginalImage() {

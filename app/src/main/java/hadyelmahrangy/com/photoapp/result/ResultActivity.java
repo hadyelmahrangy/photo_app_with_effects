@@ -351,6 +351,15 @@ public class ResultActivity extends BaseActivity {
                         }
                     }
                     break;
+                case RC_SAVE_IMAGE:
+                    if (result == PackageManager.PERMISSION_GRANTED) {
+                        onSaveClick();
+                    } else {
+                        if (isPermissionNeverAsk(permission)) {
+                            PermissionManager.showPermissionNeverAskDialog(ResultActivity.this, getPermissionName(permission));
+                        }
+                    }
+                    break;
             }
         }
     }
@@ -360,13 +369,5 @@ public class ResultActivity extends BaseActivity {
         if (permission.equals(PERMISSION_STORAGE_READ)) return "Storage read";
         if (permission.equals(PERMISSION_STORAGE_WRITE)) return "Storage write";
         return "Storage";
-    }
-
-    private Bitmap loadBitmapFromView(View v) {
-        Bitmap b = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(b);
-        v.layout(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
-        v.draw(c);
-        return b;
     }
 }
