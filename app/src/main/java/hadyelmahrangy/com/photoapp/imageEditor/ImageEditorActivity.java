@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import com.squareup.otto.Subscribe;
 import com.zomato.photofilters.imageprocessors.Filter;
 
 import java.io.IOException;
@@ -35,6 +36,8 @@ import butterknife.OnClick;
 import hadyelmahrangy.com.photoapp.BaseActivity;
 import hadyelmahrangy.com.photoapp.R;
 import hadyelmahrangy.com.photoapp.adv.AdvActivity;
+import hadyelmahrangy.com.photoapp.eventBus.AppBus;
+import hadyelmahrangy.com.photoapp.eventBus.PhotoFromGalleryEvent;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.emoji.EmojisAdapter;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.EditImageFragment;
 import hadyelmahrangy.com.photoapp.imageEditor.adapters.filters.FiltersListFragment;
@@ -124,6 +127,7 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
 
     @Override
     protected void onViewReady() {
+        AppBus.getBus().register(this);
         getPhoto();
         getScreenSize();
         initSDK();
@@ -133,6 +137,12 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
     protected void onResume() {
         super.onResume();
         hideStatusBar();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        AppBus.getBus().unregister(this);
     }
 
     @Override
@@ -199,6 +209,13 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
         setLayoutsVisibility(View.GONE, View.GONE, View.GONE, View.VISIBLE, View.VISIBLE, View.VISIBLE);
     }
 
+    @Subscribe
+    public void onReceiveImage(@NonNull PhotoFromGalleryEvent photo) {
+        getPhoto(photo.getImage());
+        clearSDK();
+        initSDK();
+    }
+
     private void selectTab(int tab) {
         switch (tab) {
             case TAB_EMOJI:
@@ -258,6 +275,11 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
 
     private void getPhoto() {
         photoUri = getIntent().getParcelableExtra(KEY_IMAGE_URI);
+        ivPhotoEdit.setImageURI(photoUri);
+    }
+
+    private void getPhoto(@NonNull Uri uri) {
+        photoUri = uri;
         ivPhotoEdit.setImageURI(photoUri);
     }
 
@@ -322,6 +344,10 @@ public class ImageEditorActivity extends BaseActivity implements EmojisAdapter.E
 
         photoEditorSDK.setOnPhotoEditorSDKListener(this);
         photoEditorSDK.initFilters();
+    }
+
+    private void clearSDK() {
+        photoEditorSDK = null;
     }
 
     @Override

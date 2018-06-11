@@ -20,7 +20,10 @@ import butterknife.OnClick;
 import hadyelmahrangy.com.photoapp.BaseActivity;
 import hadyelmahrangy.com.photoapp.R;
 import hadyelmahrangy.com.photoapp.adv.AdvActivity;
+import hadyelmahrangy.com.photoapp.eventBus.AppBus;
+import hadyelmahrangy.com.photoapp.eventBus.PhotoFromGalleryEvent;
 import hadyelmahrangy.com.photoapp.gallery.GalleryActivity;
+import hadyelmahrangy.com.photoapp.imageEditor.ImageEditorActivity;
 import hadyelmahrangy.com.photoapp.util.CapturePhotoUtils;
 import hadyelmahrangy.com.photoapp.util.PermissionManager;
 
@@ -149,8 +152,8 @@ public class ResultActivity extends BaseActivity {
             if (resultCode == RESULT_OK) {
                 Uri imageUri = data.getData();
                 if (imageUri != null) {
-                    photoUri = imageUri;
-                    ivPhoto.setImageURI(photoUri);
+                    AppBus.getBus().post(new PhotoFromGalleryEvent(imageUri));
+                    finish();
                 } else {
                     showMessage("Fail to load image");
                 }
