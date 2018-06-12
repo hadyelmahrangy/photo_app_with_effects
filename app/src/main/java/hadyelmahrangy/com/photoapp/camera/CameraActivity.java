@@ -145,7 +145,7 @@ public class CameraActivity extends BaseActivity {
                     @Override
                     public void onSaveSuccess(Uri uri) {
                         //    ResultActivity.launch(CameraActivity.this, uri);
-                        ImageEditorActivity.launch(CameraActivity.this, uri);
+                        ImageEditorActivity.launch(CameraActivity.this, uri, false);
                     }
 
                     @Override
@@ -284,7 +284,7 @@ public class CameraActivity extends BaseActivity {
                     Uri uri = intent.getData();
                     if (uri != null) {
                         //ResultActivity.launch(this, uri);
-                        ImageEditorActivity.launch(this, uri);
+                        ImageEditorActivity.launch(this, uri, true);
                     }
                 }
             }
@@ -298,13 +298,5 @@ public class CameraActivity extends BaseActivity {
                 return "Camera";
         }
         return "";
-    }
-
-    private class GraphicFaceTrackerFactory implements MultiProcessor.Factory<Face> {
-        @Override
-        public Tracker<Face> create(Face face) {
-            return new CameraFaceHelper.GraphicFaceTracker(mGraphicOverlay, CameraActivity.this);
-        }
-
     }
 }

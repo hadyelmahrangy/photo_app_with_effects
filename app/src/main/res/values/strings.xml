@@ -14,6 +14,7 @@
     <string name="save_image_question">Save image?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="processing">Processing…</string>
 
     <string name="message_about_update">We are still working on 3D filters to provide a service that suits your privilege. Please enjoy resizing your hijab at the moment until next update. Thank you.</string>
     <string name="do_not_show_msg">Do not show this message again.</string>
