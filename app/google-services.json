@@ -1,0 +1,59 @@
+{
+  "project_info": {
+    "project_number": "794162300876",
+    "firebase_url": "https://hitjabi-bc234.firebaseio.com",
+    "project_id": "hitjabi-bc234",
+    "storage_bucket": "hitjabi-bc234.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:794162300876:android:c4e4510ce4f9c896",
+        "android_client_info": {
+          "package_name": "hadyelmahrangy.com.photoapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "794162300876-jt3ned8f769id3725cfk2fsamsh9fdg4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hadyelmahrangy.com.photoapp",
+            "certificate_hash": "c9296f84fc44a0e7e157039b82bf0e9bdf4e3843"
+          }
+        },
+        {
+          "client_id": "794162300876-1vcmd2o179bfdrdtbev9jtqsfclchk94.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "794162300876-1vcmd2o179bfdrdtbev9jtqsfclchk94.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [''
+        {
+          "current_key": "AIzaSyBdPXI2j6-clOHQm3I84MVXxhHWocsPK4o"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "794162300876-1vcmd2o179bfdrdtbev9jtqsfclchk94.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
