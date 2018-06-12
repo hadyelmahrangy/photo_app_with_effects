@@ -1,10 +1,10 @@
 package hadyelmahrangy.com.photoapp.camera;
 
 import android.Manifest;
-import android.app.AlertDialog;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
@@ -13,20 +13,19 @@ import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.vision.MultiProcessor;
-import com.google.android.gms.vision.Tracker;
-import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 import com.google.android.gms.vision.face.LargestFaceFocusingProcessor;
 
 import java.io.IOException;
-import java.security.Policy;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -62,6 +61,9 @@ public class CameraActivity extends BaseActivity {
 
     @BindView(R.id.faceOverlay)
     GraphicOverlay mGraphicOverlay;
+
+    @BindView(R.id.flash_view_back)
+    View flashView;
 
     private CameraSource mCameraSource;
 
@@ -138,6 +140,7 @@ public class CameraActivity extends BaseActivity {
 
     @OnClick(R.id.iv_create_photo)
     public void makePhotoClick() {
+        startFlashAnimation();
         mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data) {
@@ -155,6 +158,14 @@ public class CameraActivity extends BaseActivity {
                 });
             }
         });
+    }
+
+    private void startFlashAnimation() {
+        ObjectAnimator anim = ObjectAnimator.ofFloat(flashView,"alpha",1f);
+        anim.setDuration(150);
+        anim.setRepeatMode(ValueAnimator.REVERSE);
+        anim.setRepeatCount(1);
+        anim.start();
     }
 
     @OnClick(R.id.iv_open_gallery)
