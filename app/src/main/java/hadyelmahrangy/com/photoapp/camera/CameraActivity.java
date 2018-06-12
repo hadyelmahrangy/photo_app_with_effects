@@ -11,6 +11,7 @@ import android.hardware.Camera;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.ViewGroup;
@@ -71,6 +72,8 @@ public class CameraActivity extends BaseActivity {
 
     private ScaleGestureDetector scaleGestureDetector;
     private CameraScaleListener mCameraScaleListener;
+
+    private CameraFaceHelper.GraphicFaceTracker graphicFaceTracker;
 
     @Override
     protected void onViewReady() {
@@ -138,6 +141,14 @@ public class CameraActivity extends BaseActivity {
 
     @OnClick(R.id.iv_create_photo)
     public void makePhotoClick() {
+        MaskPoint maskPoint = new MaskPoint(-1, -1, -1, -1);
+        if (graphicFaceTracker != null) {
+            FaceGraphic faceGraphic = graphicFaceTracker.getFaceGraphic();
+            if (faceGraphic != null) {
+                maskPoint = faceGraphic.getMaskPoint();
+            }
+        }
+        final MaskPoint finalMaskPoint = maskPoint;
         mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data) {
@@ -145,7 +156,7 @@ public class CameraActivity extends BaseActivity {
                     @Override
                     public void onSaveSuccess(Uri uri) {
                         //    ResultActivity.launch(CameraActivity.this, uri);
-                        ImageEditorActivity.launch(CameraActivity.this, uri, false);
+                        ImageEditorActivity.launch(CameraActivity.this, uri, finalMaskPoint);
                     }
 
                     @Override
@@ -197,9 +208,11 @@ public class CameraActivity extends BaseActivity {
                 new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory())
                         .build());*/
 
+        graphicFaceTracker = new CameraFaceHelper.GraphicFaceTracker(mGraphicOverlay, this);
+
         detector.setProcessor(
                 new LargestFaceFocusingProcessor.Builder(detector,
-                        new CameraFaceHelper.GraphicFaceTracker(mGraphicOverlay, this))
+                        graphicFaceTracker)
                         .build());
 
         DisplayMetrics metrics = new DisplayMetrics();

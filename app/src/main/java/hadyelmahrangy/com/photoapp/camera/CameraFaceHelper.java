@@ -52,6 +52,10 @@ public class CameraFaceHelper {
         public void onDone() {
             mOverlay.remove(mFaceGraphic);
         }
+
+        public FaceGraphic getFaceGraphic() {
+            return mFaceGraphic;
+        }
     }
 
 

@@ -46,6 +46,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import hadyelmahrangy.com.photoapp.BaseActivity;
 import hadyelmahrangy.com.photoapp.R;
+import hadyelmahrangy.com.photoapp.camera.MaskPoint;
 import hadyelmahrangy.com.photoapp.eventBus.AppBus;
 import hadyelmahrangy.com.photoapp.eventBus.PhotoFromGalleryEvent;
 import hadyelmahrangy.com.photoapp.adv.BaseAdvActivity;
@@ -82,6 +83,9 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
 
     private static final String KEY_IMAGE_URI = "key_image_uri";
     private static final String KEY_IS_FROM_GALLERY = "key_is_from_gallery";
+    private static final String KEY_MASK_POINT = "key_mask_point";
+
+
     public static final String ASSETS_HAJIB = "hajib";
 
     private static final int TAB_EMOJI = 0;
@@ -92,6 +96,15 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
         Intent intent = new Intent(appCompatActivity, ImageEditorActivity.class);
         intent.putExtra(KEY_IMAGE_URI, imageUri);
         intent.putExtra(KEY_IS_FROM_GALLERY, isFromGallery);
+        appCompatActivity.startActivity(intent);
+    }
+
+
+    public static void launch(@NonNull AppCompatActivity appCompatActivity, @NonNull Uri imageUri, @NonNull MaskPoint maskPoint) {
+        Intent intent = new Intent(appCompatActivity, ImageEditorActivity.class);
+        intent.putExtra(KEY_IMAGE_URI, imageUri);
+        intent.putExtra(KEY_IS_FROM_GALLERY, false);
+        intent.putExtra(KEY_MASK_POINT, maskPoint);
         appCompatActivity.startActivity(intent);
     }
 
@@ -292,6 +305,25 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
                             if (!ImageEditorActivity.this.isFinishing() && resource != null) {
                                 ivPhotoEdit.setImageBitmap(resource);
                                 initSDK();
+
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        final MaskPoint maskPoint = (MaskPoint) getIntent().getSerializableExtra(KEY_MASK_POINT);
+                                        if (maskPoint != null) {
+                                            if (!(maskPoint.getX1() == -1 && maskPoint.getX2() == -1 && maskPoint.getY1() == -1 && maskPoint.getY2() == -1)) {
+                                                if (photoEditorSDK != null) {
+                                                    runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            photoEditorSDK.addImage("hijab-1.png", maskPoint);
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    }
+                                }).start();
                             }
                         }
                     });
