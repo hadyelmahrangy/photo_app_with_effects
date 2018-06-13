@@ -21,82 +21,89 @@
 
     </hadyelmahrangy.com.photoapp.camera.CameraSourcePreview>
 
-    <View
-        android:id="@+id/flash_view_back"
-        android:background="@drawable/round_border"
-        android:alpha="0"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
 
 
-    <CheckBox
-        android:id="@+id/iv_flash"
-        android:layout_width="25dp"
-        android:layout_height="35dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_margin="13dp"
-        android:text="@null"
-        android:foreground="?android:attr/selectableItemBackgroundBorderless"
-        android:button="@null"
-        android:scaleType="fitXY"
-        android:background="@drawable/selector_flash" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:paddingBottom="25dp">
-
-        <FrameLayout
-            android:layout_width="wrap_content"
+        <View
+            android:id="@+id/flash_view_back"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:alpha="0"
+            android:background="@drawable/round_border" />
 
-            <ImageView
-                android:id="@+id/iv_swap_camera"
+
+        <CheckBox
+            android:id="@+id/iv_flash"
+            android:layout_width="25dp"
+            android:layout_height="35dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="13dp"
+            android:background="@drawable/selector_flash"
+            android:button="@null"
+            android:foreground="?android:attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitXY"
+            android:text="@null" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal"
+            android:paddingBottom="25dp">
+
+            <FrameLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:foreground="?android:attr/selectableItemBackgroundBorderless"
-                android:padding="10dp"
-                android:src="@mipmap/btn_swap_camera" />
+                android:layout_height="match_parent"
+                android:layout_weight="1">
 
-        </FrameLayout>
+                <ImageView
+                    android:id="@+id/iv_swap_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                    android:padding="10dp"
+                    android:src="@mipmap/btn_swap_camera" />
 
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
+            </FrameLayout>
 
-            <ImageView
-                android:id="@+id/iv_create_photo"
-                android:layout_width="85dp"
-                android:layout_height="85dp"
-                android:layout_gravity="center"
-                android:foreground="?android:attr/selectableItemBackgroundBorderless"
-                android:padding="10dp"
-                android:src="@mipmap/btn_take_photo" />
-
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <ImageView
-                android:id="@+id/iv_open_gallery"
+            <FrameLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:foreground="?android:attr/selectableItemBackgroundBorderless"
-                android:padding="10dp"
-                android:src="@drawable/ic_add" />
+                android:layout_height="match_parent"
+                android:layout_weight="1">
 
-        </FrameLayout>
+                <ImageView
+                    android:id="@+id/iv_create_photo"
+                    android:layout_width="85dp"
+                    android:layout_height="85dp"
+                    android:layout_gravity="center"
+                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                    android:padding="10dp"
+                    android:src="@mipmap/btn_take_photo" />
 
-    </LinearLayout>
+            </FrameLayout>
 
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/iv_open_gallery"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_add" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
 </RelativeLayout>

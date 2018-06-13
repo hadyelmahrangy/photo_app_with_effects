@@ -231,7 +231,7 @@ public class CameraActivity extends BaseActivity {
 
         CameraSource.Builder cameraBuilder = new CameraSource.Builder(context, detector)
                 .setFacing(mCameraFacing)
-                .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
+//                .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
                 .setRequestedFps(60.0f)
                 .setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)
                 .setFlashMode(mFlashState);

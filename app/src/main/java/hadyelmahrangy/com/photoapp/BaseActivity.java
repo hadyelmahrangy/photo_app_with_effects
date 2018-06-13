@@ -68,10 +68,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void hideStatusBar() {
-        View decorView = getWindow().getDecorView();
+/*        View decorView = getWindow().getDecorView();
         // Hide the status bar.
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);
+        decorView.setSystemUiVisibility(uiOptions);*/
     }
 
     public Bitmap loadBitmapFromView(View v) {
