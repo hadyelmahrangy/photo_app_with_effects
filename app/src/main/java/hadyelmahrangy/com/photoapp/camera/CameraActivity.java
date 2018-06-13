@@ -157,7 +157,7 @@ public class CameraActivity extends BaseActivity {
         mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data) {
-                CapturePhotoUtils.savePhotoToFile(CameraActivity.this, data, new CapturePhotoUtils.SavePhotoToFileCallback() {
+                CapturePhotoUtils.savePhotoToFile(CameraActivity.this, data, mCameraSource.getCameraFacing(), new CapturePhotoUtils.SavePhotoToFileCallback() {
                     @Override
                     public void onSaveSuccess(Uri uri) {
                         muteAudio(false);

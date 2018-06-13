@@ -18,6 +18,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import hadyelmahrangy.com.photoapp.camera.CameraSource;
+
 public class CapturePhotoUtils {
 
     public interface SavePhotoToGalleryCallback {
@@ -33,14 +35,16 @@ public class CapturePhotoUtils {
         void onSaveFail(String error);
     }
 
-    public static void savePhotoToFile(@NonNull final Activity activity, final byte[] data, @NonNull final SavePhotoToFileCallback callback) {
+    public static void savePhotoToFile(@NonNull final Activity activity, final byte[] data, final int cameraFacing, @NonNull final SavePhotoToFileCallback callback) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 OutputStream os = null;
                 try {
                     Bitmap realImage = BitmapFactory.decodeByteArray(data, 0, data.length);
-                    realImage = flip(realImage);
+                    if (cameraFacing == CameraSource.CAMERA_FACING_FRONT) {
+                        realImage = flip(realImage);
+                    }
                     File file = createImageFileName(activity);
                     os = new FileOutputStream(file);
                     realImage.compress(Bitmap.CompressFormat.JPEG, 100, os);
