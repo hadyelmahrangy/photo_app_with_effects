@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
@@ -152,23 +153,34 @@ public class CameraActivity extends BaseActivity {
             }
         }
         final MaskPoint finalMaskPoint = maskPoint;
+
+        muteAudio(true);
+
         mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data) {
                 CapturePhotoUtils.savePhotoToFile(CameraActivity.this, data, new CapturePhotoUtils.SavePhotoToFileCallback() {
                     @Override
                     public void onSaveSuccess(Uri uri) {
+                        muteAudio(false);
                         //    ResultActivity.launch(CameraActivity.this, uri);
                         ImageEditorActivity.launch(CameraActivity.this, uri, finalMaskPoint);
                     }
 
                     @Override
                     public void onSaveFail(String error) {
+                        muteAudio(false);
                         showMessage(error);
                     }
                 });
             }
         });
+    }
+
+    private void muteAudio(boolean isMute) {
+        AudioManager mgr = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        if (mgr != null)
+        mgr.setStreamMute(AudioManager.STREAM_SYSTEM, isMute);
     }
 
     private void startFlashAnimation() {
