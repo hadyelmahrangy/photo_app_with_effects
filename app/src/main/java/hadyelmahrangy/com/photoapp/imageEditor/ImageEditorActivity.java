@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -19,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
@@ -84,6 +86,7 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
     private static final String KEY_IMAGE_URI = "key_image_uri";
     private static final String KEY_IS_FROM_GALLERY = "key_is_from_gallery";
     private static final String KEY_MASK_POINT = "key_mask_point";
+    private static final String KEY_IS_CAMERA_FRONT = "key_is_camera_front";
 
 
     public static final String ASSETS_HAJIB = "hajib";
@@ -100,11 +103,12 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
     }
 
 
-    public static void launch(@NonNull AppCompatActivity appCompatActivity, @NonNull Uri imageUri, @NonNull MaskPoint maskPoint) {
+    public static void launch(@NonNull AppCompatActivity appCompatActivity, @NonNull Uri imageUri, @NonNull MaskPoint maskPoint, boolean isSameraFront) {
         Intent intent = new Intent(appCompatActivity, ImageEditorActivity.class);
         intent.putExtra(KEY_IMAGE_URI, imageUri);
         intent.putExtra(KEY_IS_FROM_GALLERY, false);
         intent.putExtra(KEY_MASK_POINT, maskPoint);
+        intent.putExtra(KEY_IS_CAMERA_FRONT, isSameraFront);
         appCompatActivity.startActivity(intent);
     }
 
@@ -303,7 +307,12 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
                         @Override
                         public void onResourceReady(Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                             if (!ImageEditorActivity.this.isFinishing() && resource != null) {
-                                ivPhotoEdit.setImageBitmap(resource);
+                                boolean isCameraFront = getIntent().getBooleanExtra(KEY_IS_CAMERA_FRONT, false);
+                                if (isCameraFront) {
+                                    ivPhotoEdit.setImageBitmap(flip(resource));
+                                } else {
+                                    ivPhotoEdit.setImageBitmap(resource);
+                                }
                                 initSDK();
 
                                 new Thread(new Runnable() {
@@ -328,6 +337,14 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
                         }
                     });
         }
+    }
+
+    public static Bitmap flip(Bitmap src) {
+        Matrix m = new Matrix();
+        m.preScale(-1, 1);
+        Bitmap dst = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), m, false);
+        dst.setDensity(DisplayMetrics.DENSITY_DEFAULT);
+        return dst;
     }
 
     private void init(@NonNull Uri uri) {

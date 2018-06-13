@@ -35,20 +35,15 @@ public class CapturePhotoUtils {
         void onSaveFail(String error);
     }
 
-    public static void savePhotoToFile(@NonNull final Activity activity, final byte[] data, final int cameraFacing, @NonNull final SavePhotoToFileCallback callback) {
+    public static void savePhotoToFile(@NonNull final Activity activity, final byte[] data, @NonNull final SavePhotoToFileCallback callback) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 OutputStream os = null;
                 try {
-                    Bitmap realImage = BitmapFactory.decodeByteArray(data, 0, data.length);
-                    if (cameraFacing == CameraSource.CAMERA_FACING_FRONT) {
-                        realImage = flip(realImage);
-                    }
                     File file = createImageFileName(activity);
                     os = new FileOutputStream(file);
-                    realImage.compress(Bitmap.CompressFormat.JPEG, 100, os);
-                    realImage.recycle();
+                    os.write(data);
                     os.close();
                     final Uri uri = Uri.fromFile(file);
                     activity.runOnUiThread(new Runnable() {
@@ -70,15 +65,6 @@ public class CapturePhotoUtils {
                 }
             }
         }).start();
-    }
-
-    public static Bitmap flip(Bitmap src)
-    {
-        Matrix m = new Matrix();
-        m.preScale(-1, 1);
-        Bitmap dst = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), m, false);
-        dst.setDensity(DisplayMetrics.DENSITY_DEFAULT);
-        return dst;
     }
 
     public static void savePhotoToFile(@NonNull final Activity activity, @NonNull final Bitmap bitmap, @NonNull final SavePhotoToFileCallback callback) {

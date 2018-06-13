@@ -157,12 +157,17 @@ public class CameraActivity extends BaseActivity {
         mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data) {
-                CapturePhotoUtils.savePhotoToFile(CameraActivity.this, data, mCameraSource.getCameraFacing(), new CapturePhotoUtils.SavePhotoToFileCallback() {
+                CapturePhotoUtils.savePhotoToFile(CameraActivity.this, data, new CapturePhotoUtils.SavePhotoToFileCallback() {
                     @Override
                     public void onSaveSuccess(Uri uri) {
                         muteAudio(false);
                         //    ResultActivity.launch(CameraActivity.this, uri);
-                        ImageEditorActivity.launch(CameraActivity.this, uri, finalMaskPoint);
+                        int cameraFacing = mCameraSource.getCameraFacing();
+                        if (cameraFacing == CameraSource.CAMERA_FACING_FRONT) {
+                            ImageEditorActivity.launch(CameraActivity.this, uri, finalMaskPoint, true);
+                        } else {
+                            ImageEditorActivity.launch(CameraActivity.this, uri, finalMaskPoint, false);
+                        }
                     }
 
                     @Override
@@ -176,13 +181,13 @@ public class CameraActivity extends BaseActivity {
     }
 
     private void muteAudio(boolean isMute) {
-        AudioManager mgr = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        AudioManager mgr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         if (mgr != null)
-        mgr.setStreamMute(AudioManager.STREAM_SYSTEM, isMute);
+            mgr.setStreamMute(AudioManager.STREAM_SYSTEM, isMute);
     }
 
     private void startFlashAnimation() {
-        ObjectAnimator anim = ObjectAnimator.ofFloat(flashView,"alpha",1f);
+        ObjectAnimator anim = ObjectAnimator.ofFloat(flashView, "alpha", 1f);
         anim.setDuration(150);
         anim.setRepeatMode(ValueAnimator.REVERSE);
         anim.setRepeatCount(1);
