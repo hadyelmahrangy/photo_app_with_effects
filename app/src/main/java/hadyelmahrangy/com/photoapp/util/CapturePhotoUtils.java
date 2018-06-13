@@ -2,11 +2,15 @@ package hadyelmahrangy.com.photoapp.util;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
+import android.util.DisplayMetrics;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -35,9 +39,12 @@ public class CapturePhotoUtils {
             public void run() {
                 OutputStream os = null;
                 try {
+                    Bitmap realImage = BitmapFactory.decodeByteArray(data, 0, data.length);
+                    realImage = flip(realImage);
                     File file = createImageFileName(activity);
                     os = new FileOutputStream(file);
-                    os.write(data);
+                    realImage.compress(Bitmap.CompressFormat.JPEG, 100, os);
+                    realImage.recycle();
                     os.close();
                     final Uri uri = Uri.fromFile(file);
                     activity.runOnUiThread(new Runnable() {
@@ -59,6 +66,15 @@ public class CapturePhotoUtils {
                 }
             }
         }).start();
+    }
+
+    public static Bitmap flip(Bitmap src)
+    {
+        Matrix m = new Matrix();
+        m.preScale(-1, 1);
+        Bitmap dst = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), m, false);
+        dst.setDensity(DisplayMetrics.DENSITY_DEFAULT);
+        return dst;
     }
 
     public static void savePhotoToFile(@NonNull final Activity activity, @NonNull final Bitmap bitmap, @NonNull final SavePhotoToFileCallback callback) {

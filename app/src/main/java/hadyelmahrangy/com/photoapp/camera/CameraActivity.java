@@ -153,9 +153,7 @@ public class CameraActivity extends BaseActivity {
             }
         }
         final MaskPoint finalMaskPoint = maskPoint;
-
         muteAudio(true);
-
         mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data) {

@@ -133,6 +133,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/hadyelmahrangy/com/photoapp/util/CapturePhotoUtils.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/hadyelmahrangy/com/photoapp/util/PermissionManager.java">
           <value>
             <set />
