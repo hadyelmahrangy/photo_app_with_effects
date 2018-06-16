@@ -4,12 +4,14 @@ import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Dialog;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -181,9 +183,13 @@ public class CameraActivity extends BaseActivity {
     }
 
     private void muteAudio(boolean isMute) {
-        AudioManager mgr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        if (mgr != null)
-            mgr.setStreamMute(AudioManager.STREAM_SYSTEM, isMute);
+        try {
+            AudioManager mgr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            if (mgr != null)
+                mgr.setStreamMute(AudioManager.STREAM_SYSTEM, isMute);
+        } catch (Exception ignored) {
+
+        }
     }
 
     private void startFlashAnimation() {

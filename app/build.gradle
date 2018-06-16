@@ -9,7 +9,7 @@ repositories {
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "hadyelmahrangy.com.photoapp"
+        applicationId "com.hitjabi.hijab"
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 1
