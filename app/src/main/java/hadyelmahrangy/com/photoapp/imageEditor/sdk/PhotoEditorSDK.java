@@ -73,7 +73,8 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View imageRootView = inflater.inflate(R.layout.photo_editor_sdk_image_item_list, null);
         ImageView imageView = imageRootView.findViewById(R.id.photo_editor_sdk_image_iv);
-        loadImage(Uri.parse("file:///android_asset/" + ImageEditorActivity.ASSETS_HAJIB + "/" + hajibName), imageView, 300);
+        float density = context.getResources().getDisplayMetrics().density;
+        loadImage(Uri.parse("file:///android_asset/" + ImageEditorActivity.ASSETS_HAJIB + "/" + hajibName), imageView, (int) density * 200);
 
         imageView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT));
@@ -92,11 +93,11 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
             onPhotoEditorSDKListener.onAddViewListener(ViewType.IMAGE, addedViews.size());
     }
 
-    public void addImage(String hajibName,@NonNull MaskPoint maskPoint) {
+    public void addImage(String hajibName, @NonNull MaskPoint maskPoint) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View imageRootView = inflater.inflate(R.layout.photo_editor_sdk_image_item_list, null);
         ImageView imageView = imageRootView.findViewById(R.id.photo_editor_sdk_image_iv);
-        loadImage(Uri.parse("file:///android_asset/" + ImageEditorActivity.ASSETS_HAJIB + "/" + hajibName), imageView, maskPoint.getX2()-maskPoint.getX1(), maskPoint.getY2()-maskPoint.getY1());
+        loadImage(Uri.parse("file:///android_asset/" + ImageEditorActivity.ASSETS_HAJIB + "/" + hajibName), imageView, maskPoint.getX2() - maskPoint.getX1(), maskPoint.getY2() - maskPoint.getY1());
 
         imageView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT));
@@ -107,8 +108,8 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
 
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.leftMargin=maskPoint.getX1();
-        params.topMargin=maskPoint.getY1();
+        params.leftMargin = maskPoint.getX1();
+        params.topMargin = maskPoint.getY1();
 
         parentView.addView(imageRootView, params);
         addedViews.add(imageRootView);

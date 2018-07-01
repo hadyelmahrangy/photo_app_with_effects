@@ -325,7 +325,7 @@ public class ImageEditorActivity extends BaseAdvActivity implements EmojisAdapte
                                                     runOnUiThread(new Runnable() {
                                                         @Override
                                                         public void run() {
-                                                            photoEditorSDK.addImage("hijab-1.png", maskPoint);
+                                                            photoEditorSDK.addImage("hijab-11.png", maskPoint);
                                                         }
                                                     });
                                                 }

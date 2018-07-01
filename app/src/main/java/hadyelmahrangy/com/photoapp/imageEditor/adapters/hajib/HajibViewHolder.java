@@ -17,12 +17,11 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import hadyelmahrangy.com.photoapp.R;
 import hadyelmahrangy.com.photoapp.imageEditor.ImageEditorActivity;
-import hadyelmahrangy.com.photoapp.imageEditor.adapters.hajib.HajibAdapter;
 
 public class HajibViewHolder extends RecyclerView.ViewHolder {
 
     @BindView(R.id.image)
-    ImageView ivBorder;
+    ImageView ivHijab;
 
     @BindView(R.id.iv_no_border)
     ImageView ivNoBorder;
@@ -41,8 +40,6 @@ public class HajibViewHolder extends RecyclerView.ViewHolder {
         ButterKnife.bind(this, itemView);
         this.context = context;
         this.listener = listener;
-        ivBorder.getLayoutParams().height = (width - 30) / 4;
-        ivBorder.getLayoutParams().width = (width - 30) / 4;
     }
 
     public void bind(@NonNull String item) {
@@ -56,7 +53,7 @@ public class HajibViewHolder extends RecyclerView.ViewHolder {
                         .skipMemoryCache(false)
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .override((int) (125 * density), (int) (125 * density)))
-                .into(ivBorder);
+                .into(ivHijab);
     }
 
     private void checkBorderPossition() {
